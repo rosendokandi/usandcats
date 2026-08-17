@@ -58,7 +58,7 @@ export const MemoriesPage: React.FC = () => {
       </div>
 
       {/* Filter Tags */}
-      <div className="flex flex-wrap gap-2 mb-10">
+      <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-6 sm:mb-10">
         {tags.map((tag) => (
           <button
             key={tag.key}
@@ -66,7 +66,7 @@ export const MemoriesPage: React.FC = () => {
               sound.playClick();
               setActiveTag(tag.key);
             }}
-            className={`pixel-btn-sm px-3.5 py-1.5 font-pixel text-xs transition-all ${
+            className={`pixel-btn-sm px-2.5 sm:px-3.5 py-1 sm:py-1.5 font-pixel text-[11px] sm:text-xs transition-all ${
               activeTag === tag.key
                 ? 'bg-primary text-on-primary font-bold shadow-pixel-sm'
                 : 'bg-surface-container-lowest dark:bg-inverse-surface text-on-surface-variant dark:text-surface-dim hover:bg-primary-container'
@@ -79,16 +79,16 @@ export const MemoriesPage: React.FC = () => {
 
       {/* Empty State when 0 photos */}
       {filteredMemories.length === 0 ? (
-        <div className="bg-surface-container-lowest dark:bg-inverse-surface pixel-border pixel-shadow-lg p-8 md:p-12 text-center max-w-lg mx-auto flex flex-col items-center my-8 animate-fadeIn">
-          <div className="w-20 h-20 bg-tertiary-container pixel-border flex items-center justify-center mb-4 animate-pulse">
-            <Camera size={36} className="text-tertiary" />
+        <div className="bg-surface-container-lowest dark:bg-inverse-surface pixel-border pixel-shadow-lg p-6 sm:p-12 text-center max-w-lg mx-auto flex flex-col items-center my-6 sm:my-8 animate-fadeIn">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-tertiary-container pixel-border flex items-center justify-center mb-3 sm:mb-4 animate-pulse">
+            <Camera size={30} className="text-tertiary" />
           </div>
           
-          <h3 className="font-display font-black text-xl md:text-2xl text-primary dark:text-primary-fixed mb-2">
+          <h3 className="font-display font-black text-lg sm:text-2xl text-primary dark:text-primary-fixed mb-1.5 sm:mb-2">
             📸 胶卷还是崭新的！
           </h3>
           
-          <p className="font-body text-xs md:text-sm text-on-surface-variant dark:text-surface-dim leading-relaxed mb-6 max-w-sm">
+          <p className="font-body text-xs sm:text-sm text-on-surface-variant dark:text-surface-dim leading-relaxed mb-5 sm:mb-6 max-w-sm">
             相册比刚洗过的盘子还干净呢~ 快去拍一张甜蜜合照或者猫咪偷懒丑照贴在这里吧！🐾
           </p>
 
@@ -97,15 +97,15 @@ export const MemoriesPage: React.FC = () => {
               sound.playClick();
               setIsAddMemoryOpen(true);
             }}
-            className="pixel-btn bg-primary text-on-primary font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2 hover:bg-primary/90 font-bold"
+            className="pixel-btn bg-primary text-on-primary font-pixel text-xs sm:text-sm px-5 sm:px-6 py-3 sm:py-3.5 flex items-center gap-2 hover:bg-primary/90 font-bold"
           >
-            <Plus size={16} />
+            <Plus size={15} />
             <span>+ 贴上第一张拍立得</span>
           </button>
         </div>
       ) : (
         /* Polaroid Masonry Grid */
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-8 space-y-8 pb-12">
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 sm:gap-8 space-y-4 sm:space-y-8 pb-12">
           {filteredMemories.map((mem) => {
             const tapeColorClass = mem.tapeColor === 'mint' 
               ? 'tape-mint' 
@@ -116,11 +116,11 @@ export const MemoriesPage: React.FC = () => {
             return (
               <article
                 key={mem.id}
-                className="polaroid-card relative bg-surface-container-lowest dark:bg-inverse-surface pixel-border p-4 pb-5 break-inside-avoid group"
+                className="polaroid-card relative bg-surface-container-lowest dark:bg-inverse-surface pixel-border p-3.5 pb-4 sm:p-4 sm:pb-5 break-inside-avoid group"
               >
                 {/* Polaroid Tape Sticker */}
                 <div 
-                  className={`${tapeColorClass} absolute -top-3.5 left-1/2 -translate-x-1/2 w-16 h-6 z-10`}
+                  className={`${tapeColorClass} absolute -top-3 left-1/2 -translate-x-1/2 w-14 sm:w-16 h-5 sm:h-6 z-10`}
                   style={{ transform: `translateX(-50%) rotate(${mem.tapeRotation || 0}deg)` }}
                 ></div>
 

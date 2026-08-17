@@ -73,36 +73,36 @@ export const LoveNotesPage: React.FC = () => {
   ];
 
   return (
-    <main className="flex-grow w-full max-w-7xl mx-auto px-4 md:px-margin-desktop py-10 md:py-16 flex flex-col gap-12">
+    <main className="flex-grow w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-margin-desktop py-6 sm:py-10 md:py-16 flex flex-col gap-6 sm:gap-12">
       {/* Hero Header */}
-      <section className="text-center max-w-2xl mx-auto space-y-3">
-        <div className="inline-flex items-center justify-center bg-primary-container text-on-primary-container font-pixel text-xs px-4 py-2 pixel-border-sm shadow-pixel-sm">
+      <section className="text-center max-w-2xl mx-auto space-y-2 sm:space-y-3">
+        <div className="inline-flex items-center justify-center bg-primary-container text-on-primary-container font-pixel text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 sm:py-2 pixel-border-sm shadow-pixel-sm">
           <span className="material-symbols-outlined text-sm mr-1.5">edit_note</span>
           像素小情书与治愈留言板
         </div>
-        <h1 className="font-display font-black text-3xl md:text-5xl text-primary dark:text-primary-fixed tracking-tight">
+        <h1 className="font-display font-black text-2xl sm:text-3xl md:text-5xl text-primary dark:text-primary-fixed tracking-tight">
           留下满满的爱意
         </h1>
-        <p className="font-body text-sm md:text-base text-on-surface-variant dark:text-surface-dim max-w-md mx-auto">
+        <p className="font-body text-xs sm:text-sm md:text-base text-on-surface-variant dark:text-surface-dim max-w-md mx-auto">
           写下一张便签，分享今日心情。这些微小的生活碎片拼凑成了我们的专属电子回忆录。
         </p>
       </section>
 
       {/* Input Box Area */}
       <section className="w-full max-w-3xl mx-auto">
-        <div className="bg-surface-container-lowest dark:bg-inverse-surface pixel-border pixel-shadow p-6 md:p-8 relative">
+        <div className="bg-surface-container-lowest dark:bg-inverse-surface pixel-border pixel-shadow p-4 sm:p-6 md:p-8 relative">
           {/* Decorative cat icon */}
-          <div className="absolute -top-3 -right-3 w-12 h-12 opacity-15 pointer-events-none">
-            <span className="material-symbols-outlined text-4xl text-primary">pets</span>
+          <div className="absolute -top-3 -right-3 w-10 sm:w-12 h-10 sm:h-12 opacity-15 pointer-events-none">
+            <span className="material-symbols-outlined text-3xl sm:text-4xl text-primary">pets</span>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative z-10 font-pixel text-xs">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-4 relative z-10 font-pixel text-xs">
             {/* Top Toolbar: Author & Note Color */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-pixel-outline pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 border-b-2 border-pixel-outline pb-2.5 sm:pb-3">
               {/* Author Switch */}
-              <div className="flex items-center gap-2">
-                <span className="text-on-surface-variant dark:text-surface-dim uppercase font-bold">来自:</span>
-                <div className="flex gap-1.5 flex-wrap">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-on-surface-variant dark:text-surface-dim uppercase font-bold text-[10px] sm:text-xs">来自:</span>
+                <div className="flex gap-1 sm:gap-1.5 flex-wrap">
                   {availableAuthors.map((name) => (
                     <button
                       key={name}
@@ -111,7 +111,7 @@ export const LoveNotesPage: React.FC = () => {
                         sound.playClick();
                         setAuthor(name);
                       }}
-                      className={`pixel-btn-sm px-2.5 py-1 text-[11px] transition-all ${
+                      className={`pixel-btn-sm px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-[11px] transition-all ${
                         author === name 
                           ? 'bg-primary text-on-primary font-bold shadow-pixel-sm' 
                           : 'bg-surface dark:bg-surface-container text-on-surface-variant hover:bg-primary-container'
@@ -124,8 +124,8 @@ export const LoveNotesPage: React.FC = () => {
               </div>
 
               {/* Color Chooser */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-on-surface-variant dark:text-surface-dim uppercase font-bold text-[10px]">便签底色:</span>
+              <div className="flex items-center gap-1 sm:gap-1.5">
+                <span className="text-on-surface-variant dark:text-surface-dim uppercase font-bold text-[9px] sm:text-[10px]">底色:</span>
                 {COLOR_OPTIONS.map((c) => (
                   <button
                     key={c.key}
@@ -135,7 +135,7 @@ export const LoveNotesPage: React.FC = () => {
                       sound.playClick();
                       setSelectedColor(c.key);
                     }}
-                    className={`w-6 h-6 pixel-border-sm transition-transform ${
+                    className={`w-5 h-5 sm:w-6 sm:h-6 pixel-border-sm transition-transform ${
                       c.bgClass
                     } ${selectedColor === c.key ? 'scale-125 border-primary shadow-pixel-sm' : 'opacity-70 hover:opacity-100'}`}
                   />

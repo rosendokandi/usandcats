@@ -101,14 +101,14 @@ export const StoryPage: React.FC = () => {
         </div>
       ) : (
         /* Timeline Container */
-        <div className="relative w-full py-8">
+        <div className="relative w-full py-6 sm:py-8">
           {/* Central Dashed/Pixel Line */}
           <div className="timeline-line hidden md:block"></div>
           {/* Mobile Line */}
-          <div className="absolute left-[30px] top-0 bottom-0 w-1 bg-pixel-outline md:hidden"></div>
+          <div className="absolute left-[18px] top-0 bottom-0 w-1 bg-pixel-outline md:hidden"></div>
 
           {/* Milestones List */}
-          <div className="space-y-12 md:space-y-16">
+          <div className="space-y-8 sm:space-y-12 md:space-y-16">
             {filteredMilestones.map((m, index) => {
               const isEven = index % 2 === 0;
 
@@ -120,17 +120,17 @@ export const StoryPage: React.FC = () => {
                   } group`}
                 >
                   {/* Node Icon on Center Line */}
-                  <div className="absolute left-7 md:left-1/2 transform -translate-x-1/2 w-12 h-12 bg-surface dark:bg-inverse-surface rounded-full border-4 border-pixel-outline flex items-center justify-center z-10 pixel-shadow-sm group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-primary text-xl">
+                  <div className="absolute left-[18px] md:left-1/2 transform -translate-x-1/2 w-9 h-9 md:w-12 md:h-12 bg-surface dark:bg-inverse-surface rounded-full border-3 md:border-4 border-pixel-outline flex items-center justify-center z-10 pixel-shadow-sm group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-primary text-base md:text-xl">
                       {m.icon || 'pets'}
                     </span>
                   </div>
 
                   {/* Content Card */}
-                  <div className="w-full pl-16 md:pl-0 md:w-5/12">
-                    <div className="bg-surface-container-lowest dark:bg-inverse-surface p-5 sm:p-6 pixel-border pixel-shadow relative group-hover:-translate-y-1 transition-transform">
+                  <div className="w-full pl-12 md:pl-0 md:w-5/12">
+                    <div className="bg-surface-container-lowest dark:bg-inverse-surface p-4 sm:p-6 pixel-border pixel-shadow relative group-hover:-translate-y-1 transition-transform">
                       {/* Decorative Tape */}
-                      <div className="absolute -top-3.5 right-4 w-12 h-5 bg-tertiary-container border-2 border-pixel-outline rotate-[-3deg]"></div>
+                      <div className="absolute -top-3 right-3 sm:right-4 w-10 sm:w-12 h-4 sm:h-5 bg-tertiary-container border-2 border-pixel-outline rotate-[-3deg]"></div>
 
                       {/* Date */}
                       <div className="font-pixel text-xs text-primary dark:text-primary-fixed font-bold mb-1.5 flex items-center justify-between">
@@ -141,15 +141,15 @@ export const StoryPage: React.FC = () => {
                           title="喜欢这段回忆"
                         >
                           <Heart 
-                            size={14} 
+                            size={13} 
                             className={m.isLiked ? 'fill-primary text-primary' : 'text-outline'} 
                           />
-                          <span className="text-[11px] font-pixel">{m.likes}</span>
+                          <span className="text-[10px] sm:text-[11px] font-pixel">{m.likes}</span>
                         </button>
                       </div>
 
                       {/* Title */}
-                      <h3 className="font-display font-bold text-lg sm:text-xl text-on-surface dark:text-inverse-on-surface mb-2">
+                      <h3 className="font-display font-bold text-base sm:text-xl text-on-surface dark:text-inverse-on-surface mb-1.5 sm:mb-2">
                         {m.title}
                       </h3>
 

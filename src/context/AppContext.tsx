@@ -288,12 +288,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Sync settings when currentRoom changes
+  useEffect(() => {
+    if (currentRoom) {
+      setSettings(prev => ({
+        ...prev,
+        partner1: currentRoom.partner1 || prev.partner1,
+        partner2: currentRoom.partner2 || prev.partner2,
+        catName: currentRoom.catName || prev.catName,
+        startDate: currentRoom.startDate || prev.startDate,
+        avatarUrl: currentRoom.avatarUrl || prev.avatarUrl,
+        heroImage: currentRoom.heroImage || prev.heroImage,
+      }));
+    }
+  }, [currentRoom]);
+
   // Calculate days together
   const [timeDetails, setTimeDetails] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
     const calculateTime = () => {
+      if (!settings.startDate) {
+        setTimeDetails({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
       const start = new Date(settings.startDate).getTime();
+      if (isNaN(start)) {
+        setTimeDetails({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
       const now = new Date().getTime();
       const diff = Math.max(0, now - start);
 
