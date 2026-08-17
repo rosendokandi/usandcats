@@ -1,4 +1,4 @@
-export type TabType = 'home' | 'story' | 'memories' | 'notes';
+export type TabType = 'gate' | 'home' | 'story' | 'memories' | 'notes';
 
 export interface RoomInfo {
   roomId: string; // e.g. "LOVE-520"

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { TabType } from '../types';
-import { Volume2, VolumeX, Settings, Heart, Radio, Home } from 'lucide-react';
+import { Volume2, VolumeX, Settings, Heart, Radio, DoorOpen } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { 
@@ -11,8 +11,7 @@ export const Header: React.FC = () => {
     updateSettings, 
     setIsSettingsOpen, 
     triggerHeartShower,
-    currentRoom,
-    setIsRoomModalOpen
+    currentRoom
   } = useApp();
 
   const navItems: { key: TabType; label: string }[] = [
@@ -35,15 +34,15 @@ export const Header: React.FC = () => {
             <span className="tracking-wide">US & CATS</span>
           </button>
 
-          {/* Room Online Indicator Badge */}
+          {/* Room / Gate Jump Button */}
           <button
-            onClick={() => setIsRoomModalOpen(true)}
+            onClick={() => setCurrentTab('gate')}
             className={`font-pixel text-[11px] px-2.5 py-1 pixel-border-sm flex items-center gap-1.5 transition-all cursor-pointer ${
               currentRoom 
-                ? 'bg-tertiary-container text-tertiary font-bold animate-pulse hover:scale-105' 
+                ? 'bg-tertiary-container text-tertiary font-bold hover:scale-105' 
                 : 'bg-surface-container text-outline hover:bg-primary-container hover:text-primary'
             }`}
-            title={currentRoom ? `已连接房间：${currentRoom.roomId}，点击管理` : "当前为本地单机模式，点击创建/加入情侣房间"}
+            title={currentRoom ? `当前房间：${currentRoom.roomId}，点击返回门禁大厅` : "点击前往情侣专属门禁大厅"}
           >
             {currentRoom ? (
               <>
@@ -53,8 +52,8 @@ export const Header: React.FC = () => {
               </>
             ) : (
               <>
-                <Home size={12} />
-                <span>情侣房间</span>
+                <DoorOpen size={12} />
+                <span>秘密小屋门禁</span>
               </>
             )}
           </button>

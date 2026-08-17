@@ -65,7 +65,15 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentTab, setCurrentTabState] = useState<TabType>('home');
+  // Determine initial tab: if URL contains gate or room invite, or no room saved, default to gate
+  const [currentTab, setCurrentTabState] = useState<TabType>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (hash.includes('gate') || hash.includes('room=')) return 'gate';
+    }
+    const savedRoom = localStorage.getItem('us_cats_room');
+    return savedRoom ? 'home' : 'gate';
+  });
 
   // Room state
   const [currentRoom, setCurrentRoomState] = useState<RoomInfo | null>(() => {
