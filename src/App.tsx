@@ -15,6 +15,7 @@ import { ImageLightbox } from './components/ImageLightbox';
 import { RoomModal } from './components/RoomModal';
 import { RealtimeToast } from './components/RealtimeToast';
 import { ConfirmModal } from './components/ConfirmModal';
+import { MobileDrawer } from './components/MobileDrawer';
 
 // Layout wrapper for authenticated romantic space (includes Header & Footer)
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -26,7 +27,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </div>
       <Footer />
 
-      {/* Global Modals & Live Notification */}
+      {/* Global Modals, Drawer & Live Notification */}
+      <MobileDrawer />
       <SettingsModal />
       <AddMilestoneModal />
       <AddMemoryModal />

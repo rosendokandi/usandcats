@@ -13,7 +13,8 @@ import {
   syncMilestoneToCloud, 
   syncMemoryToCloud, 
   syncLoveNoteToCloud, 
-  deleteCloudItem 
+  deleteCloudItem,
+  updateCloudRoomSettings
 } from '../utils/cloudSync';
 import { supabase } from '../utils/supabase';
 
@@ -52,9 +53,11 @@ interface AppContextType {
   togglePinLoveNote: (id: string) => void;
   deleteLoveNote: (id: string) => void;
 
-  // Modals
+  // Modals & Drawer
   isSettingsOpen: boolean;
   setIsSettingsOpen: (open: boolean) => void;
+  isMobileDrawerOpen: boolean;
+  setIsMobileDrawerOpen: (open: boolean) => void;
   isAddMilestoneOpen: boolean;
   setIsAddMilestoneOpen: (open: boolean) => void;
   isAddMemoryOpen: boolean;
@@ -79,6 +82,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [realtimeToast, setRealtimeToast] = useState<RealtimeToastMsg | null>(null);
 
   // Settings
@@ -187,6 +191,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Load cloud data for room
   const loadCloudDataForRoom = useCallback(async (roomId: string) => {
+    const upperRoomId = roomId.toUpperCase().trim();
+
+    // Fetch room settings from Supabase rooms table
+    try {
+      const { data: roomData } = await supabase
+        .from('rooms')
+        .select('*')
+        .eq('id', upperRoomId)
+        .single();
+
+      if (roomData) {
+        setSettings(prev => ({
+          ...prev,
+          partner1: roomData.partner1 || prev.partner1,
+          partner2: roomData.partner2 || prev.partner2,
+          startDate: roomData.start_date || prev.startDate,
+          catName: roomData.cat_name || prev.catName,
+          avatarUrl: roomData.avatar_url || prev.avatarUrl,
+        }));
+      }
+    } catch (e) {
+      console.warn('Failed to load room settings from cloud:', e);
+    }
+
     const data = await fetchCloudRoomData(roomId);
     if (data) {
       if (data.milestones.length > 0) setMilestones(data.milestones);
@@ -311,7 +339,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [settings.startDate]);
 
   const updateSettings = (newSettings: Partial<UserSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
+    setSettings(prev => {
+      const updated = { ...prev, ...newSettings };
+      if (currentRoom) {
+        setCurrentRoomState(prevRoom => {
+          if (!prevRoom) return null;
+          const updatedRoom: RoomInfo = {
+            ...prevRoom,
+            partner1: updated.partner1,
+            partner2: updated.partner2,
+            startDate: updated.startDate,
+            catName: updated.catName,
+            avatarUrl: updated.avatarUrl,
+            heroImage: updated.heroImage,
+          };
+          localStorage.setItem('us_cats_room', JSON.stringify(updatedRoom));
+          return updatedRoom;
+        });
+
+        // Sync room profile updates to Supabase cloud!
+        updateCloudRoomSettings(currentRoom.roomId, updated);
+      }
+      return updated;
+    });
   };
 
   // Milestone Actions
@@ -503,6 +553,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteLoveNote,
         isSettingsOpen,
         setIsSettingsOpen,
+        isMobileDrawerOpen,
+        setIsMobileDrawerOpen,
         isAddMilestoneOpen,
         setIsAddMilestoneOpen,
         isAddMemoryOpen,

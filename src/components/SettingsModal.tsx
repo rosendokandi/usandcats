@@ -22,6 +22,12 @@ export const SettingsModal: React.FC = () => {
   
   const [formData, setFormData] = useState(settings);
 
+  React.useEffect(() => {
+    if (isSettingsOpen) {
+      setFormData(settings);
+    }
+  }, [isSettingsOpen, settings]);
+
   if (!isSettingsOpen) return null;
 
   const handleSave = (e: React.FormEvent) => {

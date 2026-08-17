@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { RoomInfo, Milestone, Memory, LoveNote } from '../types';
+import { RoomInfo, Milestone, Memory, LoveNote, UserSettings } from '../types';
 
 // Simple hash for room passcode (for light client-side matching)
 export const hashPasscode = (passcode: string): string => {
@@ -204,3 +204,25 @@ export const deleteCloudItem = async (table: 'milestones' | 'memories' | 'love_n
     console.warn('Delete cloud item error', e);
   }
 };
+
+export const updateCloudRoomSettings = async (roomId: string, settings: Partial<UserSettings>) => {
+  try {
+    const upperRoomId = roomId.toUpperCase().trim();
+    const updatePayload: Record<string, any> = {
+      updated_at: new Date().toISOString(),
+    };
+    if (settings.partner1 !== undefined) updatePayload.partner1 = settings.partner1;
+    if (settings.partner2 !== undefined) updatePayload.partner2 = settings.partner2;
+    if (settings.startDate !== undefined) updatePayload.start_date = settings.startDate;
+    if (settings.catName !== undefined) updatePayload.cat_name = settings.catName;
+    if (settings.avatarUrl !== undefined) updatePayload.avatar_url = settings.avatarUrl;
+
+    await supabase
+      .from('rooms')
+      .update(updatePayload)
+      .eq('id', upperRoomId);
+  } catch (err) {
+    console.warn('Update cloud room settings error:', err);
+  }
+};
+
