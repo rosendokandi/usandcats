@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { TabType, Milestone, Memory, LoveNote, UserSettings } from '../types';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { TabType, Milestone, Memory, LoveNote, UserSettings, RoomInfo, RealtimeToastMsg } from '../types';
 import { 
   DEFAULT_SETTINGS, 
   DEFAULT_MILESTONES, 
@@ -8,6 +8,14 @@ import {
 } from '../utils/defaultData';
 import { sound } from '../utils/sound';
 import { fireHeartShower } from '../utils/confetti';
+import { 
+  fetchCloudRoomData, 
+  syncMilestoneToCloud, 
+  syncMemoryToCloud, 
+  syncLoveNoteToCloud, 
+  deleteCloudItem 
+} from '../utils/cloudSync';
+import { supabase } from '../utils/supabase';
 
 interface AppContextType {
   currentTab: TabType;
@@ -17,6 +25,15 @@ interface AppContextType {
   daysTogether: number;
   timeTogetherDetails: { days: number; hours: number; minutes: number; seconds: number };
   
+  // Room & Cloud Sync
+  currentRoom: RoomInfo | null;
+  setCurrentRoom: (room: RoomInfo | null) => void;
+  isRoomModalOpen: boolean;
+  setIsRoomModalOpen: (open: boolean) => void;
+  realtimeToast: RealtimeToastMsg | null;
+  setRealtimeToast: (msg: RealtimeToastMsg | null) => void;
+  loadCloudDataForRoom: (roomId: string) => Promise<void>;
+
   milestones: Milestone[];
   addMilestone: (m: Omit<Milestone, 'id' | 'likes'>) => void;
   toggleLikeMilestone: (id: string) => void;
@@ -50,7 +67,16 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTab, setCurrentTabState] = useState<TabType>('home');
 
-  // Load / Save Settings
+  // Room state
+  const [currentRoom, setCurrentRoomState] = useState<RoomInfo | null>(() => {
+    const saved = localStorage.getItem('us_cats_room');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+  const [realtimeToast, setRealtimeToast] = useState<RealtimeToastMsg | null>(null);
+
+  // Settings
   const [settings, setSettings] = useState<UserSettings>(() => {
     const saved = localStorage.getItem('us_cats_settings');
     return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
@@ -79,6 +105,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
   const [isAddMemoryOpen, setIsAddMemoryOpen] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; title?: string } | null>(null);
+
+  // Save room state
+  const setCurrentRoom = (room: RoomInfo | null) => {
+    setCurrentRoomState(room);
+    if (room) {
+      localStorage.setItem('us_cats_room', JSON.stringify(room));
+    } else {
+      localStorage.removeItem('us_cats_room');
+    }
+  };
 
   // Sync sound setting
   useEffect(() => {
@@ -110,6 +146,102 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('us_cats_notes', JSON.stringify(loveNotes));
   }, [loveNotes]);
+
+  // Load cloud data for room
+  const loadCloudDataForRoom = useCallback(async (roomId: string) => {
+    const data = await fetchCloudRoomData(roomId);
+    if (data) {
+      if (data.milestones.length > 0) setMilestones(data.milestones);
+      if (data.memories.length > 0) setMemories(data.memories);
+      if (data.loveNotes.length > 0) setLoveNotes(data.loveNotes);
+    }
+  }, []);
+
+  // Initial cloud sync if room exists
+  useEffect(() => {
+    if (currentRoom?.roomId) {
+      loadCloudDataForRoom(currentRoom.roomId);
+    }
+  }, [currentRoom?.roomId, loadCloudDataForRoom]);
+
+  // Supabase Realtime WebSocket Listener for current room
+  useEffect(() => {
+    if (!currentRoom?.roomId) return;
+
+    const roomId = currentRoom.roomId.toUpperCase();
+    const channel = supabase
+      .channel(`room-${roomId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'love_notes', filter: `room_id=eq.${roomId}` },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newRow = payload.new as any;
+            const newNote: LoveNote = {
+              id: newRow.id,
+              author: newRow.author,
+              content: newRow.content,
+              date: newRow.date,
+              mood: newRow.mood,
+              moodIcon: newRow.mood_icon,
+              bgColor: newRow.bg_color || 'pink',
+              rotation: newRow.rotation || 0,
+              likes: newRow.likes || 0,
+              isPinned: newRow.is_pinned || false,
+              imageUrl: newRow.image_url,
+            };
+            setLoveNotes(prev => {
+              if (prev.some(n => n.id === newNote.id)) return prev;
+              return [newNote, ...prev];
+            });
+            sound.playSuccess();
+            fireHeartShower();
+            setRealtimeToast({
+              id: `${Date.now()}`,
+              message: `${newRow.author} 刚刚在小情书留下一张新便签！💌`,
+              type: 'note',
+              sender: newRow.author
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'memories', filter: `room_id=eq.${roomId}` },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newRow = payload.new as any;
+            const newMem: Memory = {
+              id: newRow.id,
+              title: newRow.title,
+              description: newRow.description,
+              date: newRow.date,
+              imageUrl: newRow.image_url,
+              category: newRow.category,
+              aspectRatio: newRow.aspect_ratio || 'square',
+              tapeColor: newRow.tape_color || 'pink',
+              tapeRotation: newRow.tape_rotation || 0,
+              likes: newRow.likes || 0,
+            };
+            setMemories(prev => {
+              if (prev.some(m => m.id === newMem.id)) return prev;
+              return [newMem, ...prev];
+            });
+            sound.playSuccess();
+            setRealtimeToast({
+              id: `${Date.now()}`,
+              message: `相册刚刚添加了一张新的拍立得回忆！📸`,
+              type: 'photo'
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentRoom?.roomId]);
 
   // Navigation tab change with sound
   const setCurrentTab = (tab: TabType) => {
@@ -151,10 +283,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: `m-${Date.now()}`,
       likes: 1,
       isLiked: true,
+      roomId: currentRoom?.roomId,
     };
     setMilestones(prev => [newM, ...prev]);
     sound.playSuccess();
     fireHeartShower();
+
+    if (currentRoom?.roomId) {
+      syncMilestoneToCloud(currentRoom.roomId, newM);
+    }
   };
 
   const toggleLikeMilestone = (id: string) => {
@@ -162,11 +299,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setMilestones(prev => prev.map(item => {
       if (item.id === id) {
         const isLiked = !item.isLiked;
-        return {
+        const updated = {
           ...item,
           isLiked,
           likes: isLiked ? item.likes + 1 : Math.max(0, item.likes - 1)
         };
+        if (currentRoom?.roomId) {
+          syncMilestoneToCloud(currentRoom.roomId, updated);
+        }
+        return updated;
       }
       return item;
     }));
@@ -179,10 +320,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: `mem-${Date.now()}`,
       likes: 1,
       isLiked: true,
+      roomId: currentRoom?.roomId,
     };
     setMemories(prev => [newMem, ...prev]);
     sound.playSuccess();
     fireHeartShower();
+
+    if (currentRoom?.roomId) {
+      syncMemoryToCloud(currentRoom.roomId, newMem);
+    }
   };
 
   const toggleLikeMemory = (id: string) => {
@@ -190,11 +336,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setMemories(prev => prev.map(item => {
       if (item.id === id) {
         const isLiked = !item.isLiked;
-        return {
+        const updated = {
           ...item,
           isLiked,
           likes: isLiked ? item.likes + 1 : Math.max(0, item.likes - 1)
         };
+        if (currentRoom?.roomId) {
+          syncMemoryToCloud(currentRoom.roomId, updated);
+        }
+        return updated;
       }
       return item;
     }));
@@ -203,6 +353,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const deleteMemory = (id: string) => {
     sound.playClick();
     setMemories(prev => prev.filter(item => item.id !== id));
+    if (currentRoom?.roomId) {
+      deleteCloudItem('memories', id);
+    }
   };
 
   // Love Note Actions
@@ -214,10 +367,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       rotation: randomRot,
       likes: 1,
       isLiked: true,
+      roomId: currentRoom?.roomId,
     };
     setLoveNotes(prev => [newNote, ...prev]);
     sound.playSuccess();
     fireHeartShower();
+
+    if (currentRoom?.roomId) {
+      syncLoveNoteToCloud(currentRoom.roomId, newNote);
+    }
   };
 
   const toggleLikeLoveNote = (id: string) => {
@@ -225,11 +383,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLoveNotes(prev => prev.map(item => {
       if (item.id === id) {
         const isLiked = !item.isLiked;
-        return {
+        const updated = {
           ...item,
           isLiked,
           likes: isLiked ? item.likes + 1 : Math.max(0, item.likes - 1)
         };
+        if (currentRoom?.roomId) {
+          syncLoveNoteToCloud(currentRoom.roomId, updated);
+        }
+        return updated;
       }
       return item;
     }));
@@ -239,7 +401,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     sound.playClick();
     setLoveNotes(prev => prev.map(item => {
       if (item.id === id) {
-        return { ...item, isPinned: !item.isPinned };
+        const updated = { ...item, isPinned: !item.isPinned };
+        if (currentRoom?.roomId) {
+          syncLoveNoteToCloud(currentRoom.roomId, updated);
+        }
+        return updated;
       }
       return item;
     }));
@@ -248,6 +414,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const deleteLoveNote = (id: string) => {
     sound.playClick();
     setLoveNotes(prev => prev.filter(item => item.id !== id));
+    if (currentRoom?.roomId) {
+      deleteCloudItem('love_notes', id);
+    }
   };
 
   // Heart Shower Trigger
@@ -272,6 +441,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateSettings,
         daysTogether: timeDetails.days,
         timeTogetherDetails: timeDetails,
+        currentRoom,
+        setCurrentRoom,
+        isRoomModalOpen,
+        setIsRoomModalOpen,
+        realtimeToast,
+        setRealtimeToast,
+        loadCloudDataForRoom,
         milestones,
         addMilestone,
         toggleLikeMilestone,

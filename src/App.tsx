@@ -10,12 +10,14 @@ import { SettingsModal } from './components/SettingsModal';
 import { AddMilestoneModal } from './components/AddMilestoneModal';
 import { AddMemoryModal } from './components/AddMemoryModal';
 import { ImageLightbox } from './components/ImageLightbox';
+import { RoomModal } from './components/RoomModal';
+import { RealtimeToast } from './components/RealtimeToast';
 
 const MainContent: React.FC = () => {
   const { currentTab } = useApp();
 
   return (
-    <div className="min-h-screen flex flex-col justify-between">
+    <div className="min-h-screen flex flex-col justify-between relative">
       <Header />
       
       {currentTab === 'home' && <HomePage />}
@@ -25,11 +27,13 @@ const MainContent: React.FC = () => {
 
       <Footer />
 
-      {/* Global Modals */}
+      {/* Global Modals & Live Notification */}
       <SettingsModal />
       <AddMilestoneModal />
       <AddMemoryModal />
       <ImageLightbox />
+      <RoomModal />
+      <RealtimeToast />
     </div>
   );
 };

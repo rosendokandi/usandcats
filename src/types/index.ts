@@ -1,7 +1,20 @@
 export type TabType = 'home' | 'story' | 'memories' | 'notes';
 
+export interface RoomInfo {
+  roomId: string; // e.g. "LOVE-520"
+  passwordHash: string;
+  partner1: string;
+  partner2: string;
+  catName: string;
+  startDate: string;
+  avatarUrl: string;
+  createdAt?: string;
+  isCloudOnline?: boolean;
+}
+
 export interface Milestone {
   id: string;
+  roomId?: string;
   date: string;
   title: string;
   description: string;
@@ -14,6 +27,7 @@ export interface Milestone {
 
 export interface Memory {
   id: string;
+  roomId?: string;
   title: string;
   description: string;
   date: string;
@@ -28,6 +42,7 @@ export interface Memory {
 
 export interface LoveNote {
   id: string;
+  roomId?: string;
   author: string;
   content: string;
   date: string;
@@ -49,4 +64,11 @@ export interface UserSettings {
   avatarUrl: string;
   soundEnabled: boolean;
   darkMode: boolean;
+}
+
+export interface RealtimeToastMsg {
+  id: string;
+  message: string;
+  type: 'note' | 'photo' | 'story' | 'heart' | 'join';
+  sender?: string;
 }

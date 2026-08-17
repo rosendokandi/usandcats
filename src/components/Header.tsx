@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { TabType } from '../types';
-import { Volume2, VolumeX, Settings, Heart } from 'lucide-react';
+import { Volume2, VolumeX, Settings, Heart, Radio, Home } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { 
@@ -10,7 +10,9 @@ export const Header: React.FC = () => {
     settings, 
     updateSettings, 
     setIsSettingsOpen, 
-    triggerHeartShower 
+    triggerHeartShower,
+    currentRoom,
+    setIsRoomModalOpen
   } = useApp();
 
   const navItems: { key: TabType; label: string }[] = [
@@ -23,14 +25,40 @@ export const Header: React.FC = () => {
   return (
     <header className="bg-surface/95 dark:bg-inverse-surface/95 border-b-4 border-pixel-outline pixel-shadow w-full sticky top-0 z-40 backdrop-blur-sm transition-colors">
       <div className="flex justify-between items-center w-full px-4 md:px-margin-desktop py-3.5 max-w-7xl mx-auto h-20">
-        {/* Brand Logo */}
-        <button 
-          onClick={() => setCurrentTab('home')}
-          className="font-pixel text-headline-md text-primary dark:text-primary-fixed flex items-center gap-2.5 text-xl md:text-2xl font-bold tracking-tight hover:opacity-90 active:scale-95 transition-all text-left"
-        >
-          <span className="material-symbols-outlined text-3xl text-primary dark:text-primary-fixed">pets</span>
-          <span className="tracking-wide">US & CATS</span>
-        </button>
+        {/* Brand Logo & Room Badge */}
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setCurrentTab('home')}
+            className="font-pixel text-headline-md text-primary dark:text-primary-fixed flex items-center gap-2 text-lg md:text-2xl font-bold tracking-tight hover:opacity-90 active:scale-95 transition-all text-left"
+          >
+            <span className="material-symbols-outlined text-2xl md:text-3xl text-primary dark:text-primary-fixed">pets</span>
+            <span className="tracking-wide">US & CATS</span>
+          </button>
+
+          {/* Room Online Indicator Badge */}
+          <button
+            onClick={() => setIsRoomModalOpen(true)}
+            className={`font-pixel text-[11px] px-2.5 py-1 pixel-border-sm flex items-center gap-1.5 transition-all cursor-pointer ${
+              currentRoom 
+                ? 'bg-tertiary-container text-tertiary font-bold animate-pulse hover:scale-105' 
+                : 'bg-surface-container text-outline hover:bg-primary-container hover:text-primary'
+            }`}
+            title={currentRoom ? `已连接房间：${currentRoom.roomId}，点击管理` : "当前为本地单机模式，点击创建/加入情侣房间"}
+          >
+            {currentRoom ? (
+              <>
+                <Radio size={12} className="text-tertiary animate-spin" />
+                <span className="hidden sm:inline">房间:</span>
+                <span>{currentRoom.roomId}</span>
+              </>
+            ) : (
+              <>
+                <Home size={12} />
+                <span>情侣房间</span>
+              </>
+            )}
+          </button>
+        </div>
 
         {/* Navigation Links (Desktop) */}
         <nav className="hidden md:flex items-center gap-4 lg:gap-6">
@@ -53,7 +81,7 @@ export const Header: React.FC = () => {
         </nav>
 
         {/* Trailing Action Icons */}
-        <div className="flex items-center gap-2.5 md:gap-3.5">
+        <div className="flex items-center gap-2 md:gap-3">
           {/* Sound Toggle */}
           <button
             onClick={() => updateSettings({ soundEnabled: !settings.soundEnabled })}
@@ -89,7 +117,7 @@ export const Header: React.FC = () => {
           <div 
             onClick={() => setIsSettingsOpen(true)}
             title="点击修改纪念日与头像"
-            className="w-10 h-10 border-4 border-pixel-outline overflow-hidden pixel-shadow-sm ml-1 cursor-pointer hover:scale-105 transition-transform bg-primary-container"
+            className="w-9 h-9 md:w-10 md:h-10 border-4 border-pixel-outline overflow-hidden pixel-shadow-sm ml-0.5 cursor-pointer hover:scale-105 transition-transform bg-primary-container"
           >
             <img
               alt="情侣头像"
