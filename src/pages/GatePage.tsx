@@ -6,7 +6,7 @@ import { sound } from '../utils/sound';
 import { hashPasscode, createCloudRoom, joinCloudRoom } from '../utils/cloudSync';
 import { fireBigCelebration } from '../utils/confetti';
 
-const MOCHI_KEY_HERO = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdZJGwxsR0WzHKqb5h1IHxvcFlXc7a9AhxuD2-xj2YTMpLosRW4uXcSw0CaHMVOjhJvp8AybpiIkuf1QhxUpoLvaj8BUh6F3I6NbX21b8B_gg2dlE1TVoiJWGVmx9yIQXBE6EL6OF1o5CNiqTdjz4PpMBMkvCV_bBPuW7l2xz_LVjMI8orTY8q9IQvfZgAePFa2N6GmWdcjJSIhsL0Smg74JihGPG9ih_9OvKBM7SbNgC1A-8kPgUtvLmAIrlNIf2luwSdk8aQrRQ';
+const MOCHI_KEY_HERO = '/images/hero-key-house.png';
 
 export const GatePage: React.FC = () => {
   const navigate = useNavigate();

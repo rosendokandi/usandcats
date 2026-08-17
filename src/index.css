@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+  *, ::before, ::after {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     background-color: #fff8f7;
     background-image: 
@@ -12,6 +17,7 @@
     background-position: center top;
     background-attachment: fixed;
     image-rendering: pixelated;
+    touch-action: manipulation;
   }
 
   .dark body {

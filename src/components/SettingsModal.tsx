@@ -4,10 +4,10 @@ import { X, Save, Volume2, VolumeX, Moon, Sun, Radio, LogOut } from 'lucide-reac
 import { sound } from '../utils/sound';
 
 const PRESET_AVATARS = [
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuDzz20depciI1E4xQB8bNanaiMnKCbIqQq0xtS6SNbKuQqXC7XWKF4T6PYZNMNnU8EwF1PkIiTGKocn8oQHlbNpy2-H-_0FNc4Vr2ZJQSjCTuevqZWfnzgojHHfsb4DhHYjy-xbRMZ8sCRTyy80x2mtYriAmAlGmAOprQX3ZKB2SEK4PjYIooKyircVD3GekH1U4i2cchQajazRmGD6uqCZsTP3JQknjmyVYviqYR0qDZv3nNg9Q1WD',
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuC3MDexdD0Zgx66Nll3VybKtH-Ap4txXorRSmMZgpBBRcmzLqIsY8uq6Bziu6FOMmhvTSnLSl3RUReUQMVna1IpEead2potG5H_za7dv8_Q9_Xe1sO6IlsdlASvnT0n8CiNgXNBLgeoQvZ-vlDwWcgRYLMwV3CvM_QH8hp4Q1hO-nKyOg9q_8MMbA26-v6PLtadWlhhL2Igrz2bSD07RNMfUUinIbTinDx0T5HcwHZy3Vc7QbQDzIVf',
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuAzsVyCRgaBZcB2p9-XHQyPNVNPSPjJ8ya3-OIuP61e0u78vs5csOmhXUGO3iDxU7_k164YyWD4tBAl8h_BrtKZbXjy9ebyTPNd7H3hNVHCPQBxVGbntH-S6d4LdSxGga4honNoF6NLdpsNONQIdWLn0pYO__u6WB34n1GG9FlXYlIaqtpTaooRuueEaA5F56Itbz6JZgJNHK0btE9YQqG4KxOdjv3URzWTYfNlYJsaFZXEi5kkYSNG',
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuCkNiio0dd7DrQbmZ6iieLbMOP7Hhj6Mmefxn3PMyr57_Ey2ls_IfZRWBOap0V97zBlthouVOUOGgttQxw2Oer9V0I5Yv1wiFw8lgehSGneNXgLLFTiNUAot0NIcol5QA1294bpaDQXIA7Wt6jO6VR7SxODs-FzqNI-7kWIhnrTaG4Ijeexe9-TgVTcGGDghv5AX74d5fPbfZrK-pZOBqlu6ifEBIDX1oECeNl_28w-7OnVV88FQg_U',
+  '/images/avatar-1.png',
+  '/images/avatar-2.png',
+  '/images/avatar-3.png',
+  '/images/avatar-4.png',
 ];
 
 export const SettingsModal: React.FC = () => {

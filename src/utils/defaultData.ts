@@ -5,16 +5,17 @@ export const DEFAULT_SETTINGS: UserSettings = {
   partner1: '',
   partner2: '',
   catName: 'Mochi',
-  avatarUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDzz20depciI1E4xQB8bNanaiMnKCbIqQq0xtS6SNbKuQqXC7XWKF4T6PYZNMNnU8EwF1PkIiTGKocn8oQHlbNpy2-H-_0FNc4Vr2ZJQSjCTuevqZWfnzgojHHfsb4DhHYjy-xbRMZ8sCRTyy80x2mtYriAmAlGmAOprQX3ZKB2SEK4PjYIooKyircVD3GekH1U4i2cchQajazRmGD6uqCZsTP3JQknjmyVYviqYR0qDZv3nNg9Q1WD',
+  avatarUrl: '/images/avatar-1.png',
   heroImage: '',
   soundEnabled: true,
   darkMode: false,
 };
 
-// Default cute pixel art placeholder for hero
-export const DEFAULT_HERO_PLACEHOLDER = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdZJGwxsR0WzHKqb5h1IHxvcFlXc7a9AhxuD2-xj2YTMpLosRW4uXcSw0CaHMVOjhJvp8AybpiIkuf1QhxUpoLvaj8BUh6F3I6NbX21b8B_gg2dlE1TVoiJWGVmx9yIQXBE6EL6OF1o5CNiqTdjz4PpMBMkvCV_bBPuW7l2xz_LVjMI8orTY8q9IQvfZgAePFa2N6GmWdcjJSIhsL0Smg74JihGPG9ih_9OvKBM7SbNgC1A-8kPgUtvLmAIrlNIf2luwSdk8aQrRQ';
+// Local pixel art placeholder for hero
+export const DEFAULT_HERO_PLACEHOLDER = '/images/hero-key-house.png';
 
-export const PIXEL_CAT_IMAGE = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDz0fUDuf_tm8uMkdsxkpaj7vHqDCVkDd0Gfv1IW9IHcvToNt3GDdKqLLjMx5VliNBs9sXyxRO7z7tfyOXbjN7-JQCnOeEwGLRcIErHwHDbKZUNSqg__WhD5NmjrACgudzXpwmGOHhf5IUUyTIAnCXj6FMi_esD_zOcun3s0dF40GTfQdzaXqAE_hqDwV4r3Zj_lK0RP07rz9wQtAMA85a1Tf-tbdlkQw8C-nRpf647R5FLpAXmwKkb';
+// Local pixel cat image
+export const PIXEL_CAT_IMAGE = '/images/pixel-cat.png';
 
 export const CAT_QUOTES = [
   "你是我最喜欢的人！✨",

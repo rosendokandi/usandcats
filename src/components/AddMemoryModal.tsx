@@ -7,19 +7,19 @@ import { sound } from '../utils/sound';
 const PRESET_SAMPLE_PHOTOS = [
   {
     title: '爱心猫咪咖啡拉花',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA-nAS9TinbU3RDOYbZWO6_Ac4h1Zl1onP-ce2eI-vcWLDJDFcTKa7cVyZEPQp5xd3OgrSoOOZLvPW-cltyDwLHFbovApLjYLd52FTBUj_PkCV012qR64VoQQSt36ErK08YQK5benRuA3UGAeGur2bSELg5EBjst4ffbu_-ZOtFZj1kikWtEK4YjTpzYlljO7onKnRRpIuCfEyv0DccZaHqhsY2jrd1FDq2DlJSCMb73byqlKTd6dhV',
+    url: '/images/sample-photo-1.png',
   },
   {
     title: '呼呼大睡的小猫 Mochi',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuApNbXTjKLlKPOgQgA9UQTEuPiUPTN-qXbvcwUBnCIWLxeVVOF9RG9mXdD_Ef6ncRk0hCV3ClcO_ptVdZaxnpKRL5byojSdEB8tySvM5qbGP1NWrQOVtQ7wRXDwRwWDdw-W4VfzSzDG6joCmB6ngq6sN2pLIkrUGXp2kKaaN_VBme-fJLY-pjQnOYYoKzSvh2jxfjWpwAxpud_395urJuLtAm8eIswKVkKShvQXdC8t0NWCFGAxdzC8',
+    url: '/images/sample-photo-2.png',
   },
   {
     title: '公园林荫道并肩散步',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAGpguA_1Dyp6Ab6KQNIr2HUcaY5qhoWekUg0nCND2FAb-me4lztrtJOFBRlXfJw_o8GBmJi9sX0q2hT5q6Z8q2Q7PTn6NUn7sINrHf0PFWxgXgNrk_Vq8HpUCxGv9lZlsDi7Z7D9Uznf8QhZ2wDE4R29SsG3tpo_MHyYMwl_2H3yIcq_p6CyL9TWe8M7z7nIFK508qiAQ_xKiIy2S8ELHdxC7cQFTl5UagbKmh5AUyCjbwUuqeD9BN',
+    url: '/images/sample-photo-3.png',
   },
   {
     title: '暖洋洋的小雏菊花束',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCJheWZVRrJ5QnUzZ6-0cf5nmA9jY1q9TI3ztIw7s46mNuXJOOP1y7-8cYmIINeSod88MaFMx2-gEVJVaWWsDXjaHLI08M-vbD4BBxJ-VuZkgFdlBZh4_ndF5M-H5A3aCxopA5IgevBCbopLhIwGwiigv4peFtGu4IA4bI-GqUA-6NNiwjnwierEnbXRa_5fBEsAYsvs-157zPAzKVIXOFJpkClIyem9cRiHiKABGBkmQ6MEUDcrvOf',
+    url: '/images/sample-photo-4.png',
   },
 ];
 
