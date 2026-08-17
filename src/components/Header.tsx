@@ -1,7 +1,8 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Volume2, VolumeX, Settings, Heart, Radio, DoorOpen } from 'lucide-react';
+import { Volume2, VolumeX, Settings, Heart, Radio, DoorOpen, LogOut } from 'lucide-react';
+import { sound } from '../utils/sound';
 
 export const Header: React.FC = () => {
   const location = useLocation();
@@ -12,7 +13,9 @@ export const Header: React.FC = () => {
     updateSettings, 
     setIsSettingsOpen, 
     triggerHeartShower,
-    currentRoom
+    currentRoom,
+    setCurrentRoom,
+    setRealtimeToast
   } = useApp();
 
   const navItems = [
@@ -24,11 +27,27 @@ export const Header: React.FC = () => {
 
   const currentPath = location.pathname === '/' ? '/home' : location.pathname;
 
+  const handleLeaveRoom = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!currentRoom) return;
+    
+    sound.playClick();
+    if (window.confirm(`确定要退出当前房间【${currentRoom.roomId}】吗？\n退出后将切回本地单机模式。`)) {
+      setCurrentRoom(null);
+      setRealtimeToast({
+        id: `${Date.now()}`,
+        message: '已成功退出房间，当前为单机模式',
+        type: 'join'
+      });
+      navigate('/gate');
+    }
+  };
+
   return (
     <header className="bg-surface/95 dark:bg-inverse-surface/95 border-b-4 border-pixel-outline pixel-shadow w-full sticky top-0 z-40 backdrop-blur-sm transition-colors">
       <div className="flex justify-between items-center w-full px-4 md:px-margin-desktop py-3.5 max-w-7xl mx-auto h-20">
         {/* Brand Logo & Room Badge */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <button 
             onClick={() => navigate('/home')}
             className="font-pixel text-headline-md text-primary dark:text-primary-fixed flex items-center gap-2 text-lg md:text-2xl font-bold tracking-tight hover:opacity-90 active:scale-95 transition-all text-left"
@@ -37,29 +56,36 @@ export const Header: React.FC = () => {
             <span className="tracking-wide">US & CATS</span>
           </button>
 
-          {/* Room / Gate Jump Button */}
-          <button
-            onClick={() => navigate('/gate')}
-            className={`font-pixel text-[11px] px-2.5 py-1 pixel-border-sm flex items-center gap-1.5 transition-all cursor-pointer ${
-              currentRoom 
-                ? 'bg-tertiary-container text-tertiary font-bold hover:scale-105' 
-                : 'bg-surface-container text-outline hover:bg-primary-container hover:text-primary'
-            }`}
-            title={currentRoom ? `当前房间：${currentRoom.roomId}，点击返回门禁大厅` : "点击前往情侣专属门禁大厅"}
-          >
-            {currentRoom ? (
-              <>
+          {/* Room / Gate Badge with Exit action */}
+          {currentRoom ? (
+            <div className="flex items-center bg-tertiary-container pixel-border-sm font-pixel text-[11px] text-tertiary">
+              <button
+                onClick={() => navigate('/gate')}
+                className="px-2 py-1 flex items-center gap-1.5 hover:opacity-80 font-bold"
+                title={`当前房间：${currentRoom.roomId}，点击返回门禁大厅`}
+              >
                 <Radio size={12} className="text-tertiary animate-spin" />
                 <span className="hidden sm:inline">房间:</span>
                 <span>{currentRoom.roomId}</span>
-              </>
-            ) : (
-              <>
-                <DoorOpen size={12} />
-                <span>秘密小屋门禁</span>
-              </>
-            )}
-          </button>
+              </button>
+              <button
+                onClick={handleLeaveRoom}
+                className="px-1.5 py-1 text-error hover:bg-error hover:text-white border-l border-pixel-outline/30 transition-colors"
+                title="退出当前房间"
+              >
+                <LogOut size={12} />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/gate')}
+              className="font-pixel text-[11px] px-2.5 py-1 pixel-border-sm flex items-center gap-1.5 transition-all cursor-pointer bg-surface-container text-outline hover:bg-primary-container hover:text-primary"
+              title="点击前往情侣专属门禁大厅"
+            >
+              <DoorOpen size={12} />
+              <span>秘密小屋门禁</span>
+            </button>
+          )}
         </div>
 
         {/* Navigation Links (Desktop) */}

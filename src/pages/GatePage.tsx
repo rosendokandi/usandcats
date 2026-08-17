@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Home, Key, Copy, Check, Sparkles, DoorOpen, ArrowRight, Radio } from 'lucide-react';
+import { Home, Key, Copy, Check, Sparkles, DoorOpen, ArrowRight, Radio, LogOut } from 'lucide-react';
 import { sound } from '../utils/sound';
 import { hashPasscode, createCloudRoom, joinCloudRoom } from '../utils/cloudSync';
 import { fireBigCelebration } from '../utils/confetti';
@@ -17,7 +17,8 @@ export const GatePage: React.FC = () => {
     setCurrentRoom,
     settings,
     updateSettings,
-    loadCloudDataForRoom
+    loadCloudDataForRoom,
+    setRealtimeToast
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
@@ -129,10 +130,25 @@ export const GatePage: React.FC = () => {
     }
   };
 
+  const handleLeaveRoom = () => {
+    if (!currentRoom) return;
+    sound.playClick();
+    if (window.confirm(`确定要退出当前房间【${currentRoom.roomId}】吗？\n退出后将切回本地单机模式。`)) {
+      setCurrentRoom(null);
+      setCreatedRoomCode(null);
+      setRealtimeToast({
+        id: `${Date.now()}`,
+        message: '已成功退出房间，当前为单机模式',
+        type: 'join'
+      });
+    }
+  };
+
   const handleCopyInvite = () => {
     sound.playClick();
-    const inviteUrl = `${window.location.origin}/room/${createdRoomCode}`;
-    const text = `亲爱的，快来我们的像素秘密小屋！\n🔗 房间暗号：${createdRoomCode}\n🔑 访问密码：${createPassword}\n直达链接：${inviteUrl}`;
+    const targetRoom = createdRoomCode || currentRoom?.roomId;
+    const inviteUrl = `${window.location.origin}/room/${targetRoom}`;
+    const text = `亲爱的，快来我们的像素秘密小屋！\n🔗 房间暗号：${targetRoom}\n${createPassword ? `🔑 访问密码：${createPassword}\n` : ''}直达链接：${inviteUrl}`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -153,17 +169,27 @@ export const GatePage: React.FC = () => {
         </div>
 
         {currentRoom && (
-          <button
-            onClick={() => {
-              sound.playClick();
-              navigate('/home');
-            }}
-            className="pixel-btn-sm px-3 py-1.5 bg-tertiary-container text-tertiary font-pixel text-xs flex items-center gap-1 font-bold"
-          >
-            <Radio size={14} className="animate-spin" />
-            <span>进入小家 ({currentRoom.roomId})</span>
-            <ArrowRight size={14} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                sound.playClick();
+                navigate('/home');
+              }}
+              className="pixel-btn-sm px-3 py-1.5 bg-tertiary-container text-tertiary font-pixel text-xs flex items-center gap-1 font-bold"
+            >
+              <Radio size={14} className="animate-spin" />
+              <span>进入小家 ({currentRoom.roomId})</span>
+              <ArrowRight size={14} />
+            </button>
+            <button
+              onClick={handleLeaveRoom}
+              className="pixel-btn-sm px-2.5 py-1.5 bg-surface text-error hover:bg-error hover:text-white font-pixel text-xs flex items-center gap-1 font-bold transition-colors"
+              title="退出当前房间"
+            >
+              <LogOut size={14} />
+              <span>退出房间</span>
+            </button>
+          </div>
         )}
       </header>
 
@@ -188,6 +214,30 @@ export const GatePage: React.FC = () => {
           <p className="font-body text-sm md:text-base text-on-surface-variant dark:text-surface-dim max-w-lg leading-relaxed">
             一人创建，双人同步。输入专属暗号与密码，开启只属于你们两个人的私密浪漫世界。
           </p>
+
+          {/* Current Room Active Status Card */}
+          {currentRoom && (
+            <div className="mt-4 bg-tertiary-container/80 text-tertiary pixel-border-sm p-3 font-pixel text-xs flex items-center gap-3 animate-fadeIn">
+              <span className="font-bold flex items-center gap-1">
+                <Radio size={14} className="animate-spin" />
+                当前已连接房间：<b>{currentRoom.roomId}</b>
+              </span>
+              <button
+                onClick={handleCopyInvite}
+                className="hover:underline flex items-center gap-1 font-bold text-secondary"
+              >
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                <span>{copied ? '已复制' : '复制邀请链接'}</span>
+              </button>
+              <button
+                onClick={handleLeaveRoom}
+                className="text-error hover:underline flex items-center gap-0.5 ml-2 font-bold"
+              >
+                <LogOut size={13} />
+                <span>退出房间</span>
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Dual Tab Card */}

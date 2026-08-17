@@ -6,8 +6,8 @@
 ---
 
 ## 📌 当前版本信息 (Current Version)
-- **当前版本号**：`v1.3.0`
-- **版本状态**：🚀 标准多路由多页面版 (Standard Multi-Page React Router & Cloud Realtime Sync)
+- **当前版本号**：`v1.3.1`
+- **版本状态**：🚀 一键退出房间与多路由增强版 (Room Leave & Multi-Page Router Enhanced)
 - **发布日期**：2026-08-17
 
 ---
@@ -82,8 +82,9 @@
 
 ---
 
-## ✅ 已实现功能清单 (v1.3.0)
+## ✅ 已实现功能清单 (v1.3.1)
 
+- [x] **一键退出房间体系**（顶部导航栏、门禁大厅、个性化设置弹窗均支持一键安全退出房间并无缝回退单机模式）。
 - [x] **标准多路由多页面架构 (React Router DOM)**：
   - `http://localhost:3000/gate` ➔ 独立门禁大厅（创建/加入房间）
   - `http://localhost:3000/home` 或 `/` ➔ 首页甜蜜空间

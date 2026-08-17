@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { X, Save, RotateCcw, Volume2, VolumeX, Moon, Sun } from 'lucide-react';
+import { X, Save, RotateCcw, Volume2, VolumeX, Moon, Sun, Radio, LogOut } from 'lucide-react';
 import { sound } from '../utils/sound';
 
 const PRESET_AVATARS = [
@@ -11,7 +12,17 @@ const PRESET_AVATARS = [
 ];
 
 export const SettingsModal: React.FC = () => {
-  const { isSettingsOpen, setIsSettingsOpen, settings, updateSettings } = useApp();
+  const navigate = useNavigate();
+  const { 
+    isSettingsOpen, 
+    setIsSettingsOpen, 
+    settings, 
+    updateSettings, 
+    currentRoom, 
+    setCurrentRoom,
+    setRealtimeToast
+  } = useApp();
+  
   const [formData, setFormData] = useState(settings);
 
   if (!isSettingsOpen) return null;
@@ -23,6 +34,21 @@ export const SettingsModal: React.FC = () => {
     setIsSettingsOpen(false);
   };
 
+  const handleLeaveRoom = () => {
+    if (!currentRoom) return;
+    sound.playClick();
+    if (window.confirm(`确定要退出当前房间【${currentRoom.roomId}】吗？\n退出后将切回本地单机模式。`)) {
+      setCurrentRoom(null);
+      setIsSettingsOpen(false);
+      setRealtimeToast({
+        id: `${Date.now()}`,
+        message: '已成功退出房间，当前为单机模式',
+        type: 'join'
+      });
+      navigate('/gate');
+    }
+  };
+
   return (
     <div 
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
@@ -32,7 +58,7 @@ export const SettingsModal: React.FC = () => {
       }}
     >
       <div 
-        className="relative w-full max-w-lg bg-surface dark:bg-inverse-surface pixel-border p-6 md:p-8 pixel-shadow-lg text-on-surface dark:text-inverse-on-surface"
+        className="relative w-full max-w-lg bg-surface dark:bg-inverse-surface pixel-border p-6 md:p-8 pixel-shadow-lg text-on-surface dark:text-inverse-on-surface max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Tape Header */}
@@ -51,12 +77,30 @@ export const SettingsModal: React.FC = () => {
         </button>
 
         {/* Title */}
-        <div className="flex items-center gap-2 mb-6 border-b-2 border-pixel-outline pb-3">
+        <div className="flex items-center gap-2 mb-4 border-b-2 border-pixel-outline pb-3">
           <span className="material-symbols-outlined text-primary text-2xl">settings</span>
           <h2 className="font-pixel text-lg text-primary dark:text-primary-fixed font-bold uppercase">
             空间个性化设置
           </h2>
         </div>
+
+        {/* Current Room Section */}
+        {currentRoom && (
+          <div className="mb-4 bg-tertiary-container/80 text-tertiary pixel-border-sm p-3 font-pixel text-xs flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Radio size={14} className="animate-spin" />
+              <span>当前房间：<b>{currentRoom.roomId}</b></span>
+            </div>
+            <button
+              type="button"
+              onClick={handleLeaveRoom}
+              className="text-error hover:underline flex items-center gap-1 font-bold"
+            >
+              <LogOut size={13} />
+              <span>退出房间</span>
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleSave} className="space-y-4 font-pixel text-xs">
           {/* Anniversary Date */}
