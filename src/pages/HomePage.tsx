@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { HERO_IMAGE } from '../utils/defaultData';
+import { DEFAULT_HERO_PLACEHOLDER } from '../utils/defaultData';
 import { InteractiveCat } from '../components/InteractiveCat';
-import { ArrowRight, BookOpen, MessageSquareHeart } from 'lucide-react';
+import { ArrowRight, BookOpen, MessageSquareHeart, Camera } from 'lucide-react';
 import { sound } from '../utils/sound';
 
 export const HomePage: React.FC = () => {
@@ -16,6 +16,7 @@ export const HomePage: React.FC = () => {
     loveNotes,
     settings,
     triggerHeartShower,
+    setIsSettingsOpen,
     setLightboxImage
   } = useApp();
 
@@ -25,7 +26,10 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     let current = 0;
     const target = daysTogether;
-    if (target <= 0) return;
+    if (target <= 0) {
+      setAnimatedDays(0);
+      return;
+    }
     const step = Math.max(1, Math.floor(target / 40));
     const timer = setInterval(() => {
       current += step;
@@ -45,9 +49,11 @@ export const HomePage: React.FC = () => {
     navigate(path);
   };
 
+  const displayHero = settings.heroImage || DEFAULT_HERO_PLACEHOLDER;
+
   return (
     <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-margin-desktop py-10 md:py-16 w-full max-w-5xl mx-auto gap-8 md:gap-12">
-      {/* Hero Image Container (Duo-Photo style) */}
+      {/* Hero Image Container */}
       <div className="relative w-full max-w-2xl bg-surface-container-lowest dark:bg-inverse-surface pixel-border p-6 md:p-8 pixel-shadow flex flex-col items-center group">
         {/* Tape corners */}
         <div className="absolute -top-3 -left-3 w-8 h-8 bg-primary-fixed border-4 border-pixel-outline z-10"></div>
@@ -57,18 +63,23 @@ export const HomePage: React.FC = () => {
         <div 
           onClick={() => {
             sound.playClick();
-            setLightboxImage({ url: HERO_IMAGE, title: '我们的故事旅程' });
+            if (settings.heroImage) {
+              setLightboxImage({ url: settings.heroImage, title: '我们的故事旅程' });
+            } else {
+              setIsSettingsOpen(true);
+            }
           }}
-          className="w-full aspect-[4/3] bg-surface-container overflow-hidden stepped-border mb-6 relative cursor-pointer group-hover:scale-[1.01] transition-transform"
+          className="w-full aspect-[4/3] bg-surface-container overflow-hidden stepped-border mb-6 relative cursor-pointer group-hover:scale-[1.01] transition-transform flex items-center justify-center"
         >
           <img
             className="w-full h-full object-cover"
-            alt="情侣合照"
-            src={HERO_IMAGE}
+            alt="情侣主图"
+            src={displayHero}
           />
-          <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <span className="bg-surface/90 text-primary px-3 py-1.5 font-pixel text-xs pixel-border-sm">
-              点击查看大图 ✨
+          <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <span className="bg-surface/95 text-primary px-3.5 py-2 font-pixel text-xs pixel-border-sm flex items-center gap-1.5 font-bold shadow-pixel-sm">
+              <Camera size={14} />
+              <span>{settings.heroImage ? '查看大图 ✨' : '点击设置上传情侣合照 📸'}</span>
             </span>
           </div>
         </div>
@@ -78,10 +89,10 @@ export const HomePage: React.FC = () => {
           我们的故事旅程
         </div>
         <div className="font-pixel text-xs md:text-sm text-on-surface-variant dark:text-surface-dim mt-2 flex items-center gap-2">
-          <span>{settings.partner1}</span>
+          <span>{settings.partner1 || '我'}</span>
           <span className="text-primary font-bold">♥</span>
-          <span>{settings.partner2}</span>
-          <span className="ml-1 text-primary">与小猫 {settings.catName} 🐾</span>
+          <span>{settings.partner2 || 'TA'}</span>
+          <span className="ml-1 text-primary">与小猫 {settings.catName || 'Mochi'} 🐾</span>
         </div>
       </div>
 
@@ -116,26 +127,26 @@ export const HomePage: React.FC = () => {
       <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
         <button
           onClick={() => handleNav('/memories')}
-          className="pixel-btn bg-primary text-on-primary font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2.5 hover:bg-primary/90"
+          className="pixel-btn bg-primary text-on-primary font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2.5 hover:bg-primary/90 font-bold"
         >
-          <span>查看甜蜜相册</span>
+          <span>甜蜜相册 ({memories.length})</span>
           <ArrowRight size={16} />
         </button>
 
         <button
           onClick={() => handleNav('/story')}
-          className="pixel-btn bg-surface dark:bg-inverse-surface text-primary dark:text-primary-fixed font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2.5 hover:bg-primary-container"
+          className="pixel-btn bg-surface dark:bg-inverse-surface text-primary dark:text-primary-fixed font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2.5 hover:bg-primary-container font-bold"
         >
           <BookOpen size={16} />
-          <span>阅读浪漫故事</span>
+          <span>浪漫故事 ({milestones.length})</span>
         </button>
 
         <button
           onClick={() => handleNav('/notes')}
-          className="pixel-btn bg-tertiary-container text-tertiary font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2.5 hover:opacity-90"
+          className="pixel-btn bg-tertiary-container text-tertiary font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2.5 hover:opacity-90 font-bold"
         >
           <MessageSquareHeart size={16} />
-          <span>打开小情书</span>
+          <span>小情书 ({loveNotes.length})</span>
         </button>
       </div>
 
@@ -148,7 +159,7 @@ export const HomePage: React.FC = () => {
           <div className="text-xl sm:text-2xl font-bold font-pixel text-primary dark:text-primary-fixed">
             {milestones.length}
           </div>
-          <div className="text-[10px] sm:text-xs font-pixel text-on-surface-variant dark:text-surface-dim uppercase mt-1">
+          <div className="text-[10px] sm:text-xs font-pixel text-on-surface-variant dark:text-surface-dim uppercase mt-1 font-bold">
             故事里程碑
           </div>
         </div>
@@ -160,7 +171,7 @@ export const HomePage: React.FC = () => {
           <div className="text-xl sm:text-2xl font-bold font-pixel text-primary dark:text-primary-fixed">
             {memories.length}
           </div>
-          <div className="text-[10px] sm:text-xs font-pixel text-on-surface-variant dark:text-surface-dim uppercase mt-1">
+          <div className="text-[10px] sm:text-xs font-pixel text-on-surface-variant dark:text-surface-dim uppercase mt-1 font-bold">
             拍立得相片
           </div>
         </div>
@@ -172,7 +183,7 @@ export const HomePage: React.FC = () => {
           <div className="text-xl sm:text-2xl font-bold font-pixel text-primary dark:text-primary-fixed">
             {loveNotes.length}
           </div>
-          <div className="text-[10px] sm:text-xs font-pixel text-on-surface-variant dark:text-surface-dim uppercase mt-1">
+          <div className="text-[10px] sm:text-xs font-pixel text-on-surface-variant dark:text-surface-dim uppercase mt-1 font-bold">
             小情书留言
           </div>
         </div>

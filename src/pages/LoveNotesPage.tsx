@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Heart, Pin, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Heart, Pin, Trash2, Image as ImageIcon, MessageSquareHeart } from 'lucide-react';
 import { sound } from '../utils/sound';
 import { LoveNote } from '../types';
 
@@ -32,7 +32,7 @@ export const LoveNotesPage: React.FC = () => {
   } = useApp();
 
   const [content, setContent] = useState('');
-  const [author, setAuthor] = useState(settings.partner1);
+  const [author, setAuthor] = useState(settings.partner1 || '我');
   const [selectedMood, setSelectedMood] = useState(MOOD_OPTIONS[0]);
   const [selectedColor, setSelectedColor] = useState<LoveNote['bgColor']>('pink');
   const [imageUrl, setImageUrl] = useState('');
@@ -44,7 +44,7 @@ export const LoveNotesPage: React.FC = () => {
     if (!content.trim()) return;
 
     addLoveNote({
-      author,
+      author: author || settings.partner1 || '神秘恋人',
       content: content.trim(),
       date: '刚刚',
       mood: selectedMood.label,
@@ -65,6 +65,12 @@ export const LoveNotesPage: React.FC = () => {
     if (!a.isPinned && b.isPinned) return 1;
     return 0;
   });
+
+  const availableAuthors = [
+    settings.partner1 || '伴侣1',
+    settings.partner2 || '伴侣2',
+    settings.catName ? `${settings.catName} 🐾` : '小猫 🐾'
+  ];
 
   return (
     <main className="flex-grow w-full max-w-7xl mx-auto px-4 md:px-margin-desktop py-10 md:py-16 flex flex-col gap-12">
@@ -96,8 +102,8 @@ export const LoveNotesPage: React.FC = () => {
               {/* Author Switch */}
               <div className="flex items-center gap-2">
                 <span className="text-on-surface-variant dark:text-surface-dim uppercase font-bold">来自:</span>
-                <div className="flex gap-1.5">
-                  {[settings.partner1, settings.partner2, `${settings.catName} 🐾`].map((name) => (
+                <div className="flex gap-1.5 flex-wrap">
+                  {availableAuthors.map((name) => (
                     <button
                       key={name}
                       type="button"
@@ -219,7 +225,7 @@ export const LoveNotesPage: React.FC = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="pixel-btn bg-primary text-on-primary font-pixel text-xs px-5 py-2.5 flex items-center gap-2 hover:bg-primary/90 uppercase tracking-wider"
+                className="pixel-btn bg-primary text-on-primary font-pixel text-xs px-5 py-2.5 flex items-center gap-2 hover:bg-primary/90 uppercase tracking-wider font-bold"
               >
                 <span>发送情书</span>
                 <Heart size={15} className="fill-on-primary" />
@@ -231,100 +237,116 @@ export const LoveNotesPage: React.FC = () => {
 
       {/* Notes Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-12">
-        {sortedNotes.map((note) => {
-          const bgClass = note.bgColor === 'mint'
-            ? 'bg-tertiary-container text-on-background'
-            : note.bgColor === 'lavender'
-            ? 'bg-secondary-container text-on-background'
-            : note.bgColor === 'cream'
-            ? 'bg-surface-container-lowest dark:bg-inverse-surface text-on-background dark:text-inverse-on-surface'
-            : 'bg-primary-container text-on-background';
+        {sortedNotes.length === 0 ? (
+          <div className="bg-surface-container-lowest dark:bg-inverse-surface pixel-border pixel-shadow-lg p-8 md:p-12 text-center max-w-lg mx-auto flex flex-col items-center col-span-full my-4 animate-fadeIn">
+            <div className="w-20 h-20 bg-secondary-container pixel-border flex items-center justify-center mb-4 animate-bounce">
+              <MessageSquareHeart size={36} className="text-secondary" />
+            </div>
+            
+            <h3 className="font-display font-black text-xl md:text-2xl text-primary dark:text-primary-fixed mb-2">
+              💌 便签板空得像周一早上的脑子~
+            </h3>
+            
+            <p className="font-body text-xs md:text-sm text-on-surface-variant dark:text-surface-dim leading-relaxed max-w-sm">
+              还没有任何悄悄话呢！在上方写下第一封小情书发给 TA 吧，对方屏幕会瞬间弹出爱心提醒和 8-bit 音效哦！💖
+            </p>
+          </div>
+        ) : (
+          sortedNotes.map((note) => {
+            const bgClass = note.bgColor === 'mint'
+              ? 'bg-tertiary-container text-on-background'
+              : note.bgColor === 'lavender'
+              ? 'bg-secondary-container text-on-background'
+              : note.bgColor === 'cream'
+              ? 'bg-surface-container-lowest dark:bg-inverse-surface text-on-background dark:text-inverse-on-surface'
+              : 'bg-primary-container text-on-background';
 
-          return (
-            <article
-              key={note.id}
-              style={{ transform: `rotate(${note.rotation}deg)` }}
-              className={`${bgClass} pixel-border pixel-shadow p-6 sticky-note-header hover:rotate-0 transition-transform duration-200 flex flex-col justify-between min-h-[220px] relative group`}
-            >
-              {/* Pinned Badge */}
-              {note.isPinned && (
-                <div className="absolute top-2 right-2 text-primary font-pixel text-[10px] flex items-center gap-0.5 bg-surface/80 px-1.5 py-0.5 pixel-border-sm">
-                  <Pin size={11} className="fill-primary" />
-                  <span>已置顶</span>
-                </div>
-              )}
-
-              {/* Note Content */}
-              <div>
-                <p className="font-body text-sm sm:text-base leading-relaxed font-bold mb-3">
-                  {note.content}
-                </p>
-
-                {/* Attached Photo */}
-                {note.imageUrl && (
-                  <div 
-                    onClick={() => {
-                      sound.playClick();
-                      setLightboxImage({ url: note.imageUrl!, title: note.content });
-                    }}
-                    className="w-full h-32 overflow-hidden pixel-border-sm mb-3 cursor-pointer hover:opacity-90"
-                  >
-                    <img src={note.imageUrl} alt="附加图片" className="w-full h-full object-cover" />
+            return (
+              <article
+                key={note.id}
+                style={{ transform: `rotate(${note.rotation}deg)` }}
+                className={`${bgClass} pixel-border pixel-shadow p-6 sticky-note-header hover:rotate-0 transition-transform duration-200 flex flex-col justify-between min-h-[220px] relative group`}
+              >
+                {/* Pinned Badge */}
+                {note.isPinned && (
+                  <div className="absolute top-2 right-2 text-primary font-pixel text-[10px] flex items-center gap-0.5 bg-surface/80 px-1.5 py-0.5 pixel-border-sm">
+                    <Pin size={11} className="fill-primary" />
+                    <span>已置顶</span>
                   </div>
                 )}
-              </div>
 
-              {/* Note Footer */}
-              <div className="mt-4 pt-3 border-t-2 border-pixel-outline flex items-center justify-between font-pixel text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-primary dark:text-primary-fixed">
-                    {note.author}
-                  </span>
-                  <span className="text-outline text-[10px]">
-                    • {note.date}
-                  </span>
+                {/* Note Content */}
+                <div>
+                  <p className="font-body text-sm sm:text-base leading-relaxed font-bold mb-3">
+                    {note.content}
+                  </p>
+
+                  {/* Attached Photo */}
+                  {note.imageUrl && (
+                    <div 
+                      onClick={() => {
+                        sound.playClick();
+                        setLightboxImage({ url: note.imageUrl!, title: note.content });
+                      }}
+                      className="w-full h-32 overflow-hidden pixel-border-sm mb-3 cursor-pointer hover:opacity-90"
+                    >
+                      <img src={note.imageUrl} alt="附加图片" className="w-full h-full object-cover" />
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2">
-                  {/* Pin button */}
-                  <button
-                    onClick={() => togglePinLoveNote(note.id)}
-                    title={note.isPinned ? "取消置顶" : "置顶此留言"}
-                    className="text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
-                  >
-                    <Pin size={14} className={note.isPinned ? 'fill-primary text-primary' : ''} />
-                  </button>
+                {/* Note Footer */}
+                <div className="mt-4 pt-3 border-t-2 border-pixel-outline flex items-center justify-between font-pixel text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-primary dark:text-primary-fixed">
+                      {note.author}
+                    </span>
+                    <span className="text-outline text-[10px]">
+                      • {note.date}
+                    </span>
+                  </div>
 
-                  {/* Delete button */}
-                  <button
-                    onClick={() => {
-                      if (confirm('确定要删除这条便签吗？')) {
-                        deleteLoveNote(note.id);
-                      }
-                    }}
-                    title="删除便签"
-                    className="text-outline hover:text-error transition-colors opacity-0 group-hover:opacity-100"
-                  >
-                    <Trash2 size={13} />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* Pin button */}
+                    <button
+                      onClick={() => togglePinLoveNote(note.id)}
+                      title={note.isPinned ? "取消置顶" : "置顶此留言"}
+                      className="text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
+                    >
+                      <Pin size={14} className={note.isPinned ? 'fill-primary text-primary' : ''} />
+                    </button>
 
-                  {/* Like button */}
-                  <button
-                    onClick={() => toggleLikeLoveNote(note.id)}
-                    className="flex items-center gap-1 hover:scale-110 active:scale-90 transition-transform text-primary"
-                    title="点赞"
-                  >
-                    <Heart
-                      size={16}
-                      className={note.isLiked ? 'fill-primary text-primary' : 'text-outline'}
-                    />
-                    <span className="font-bold text-[11px]">{note.likes}</span>
-                  </button>
+                    {/* Delete button */}
+                    <button
+                      onClick={() => {
+                        if (confirm('确定要删除这条便签吗？')) {
+                          deleteLoveNote(note.id);
+                        }
+                      }}
+                      title="删除便签"
+                      className="text-outline hover:text-error transition-colors opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+
+                    {/* Like button */}
+                    <button
+                      onClick={() => toggleLikeLoveNote(note.id)}
+                      className="flex items-center gap-1 hover:scale-110 active:scale-90 transition-transform text-primary"
+                      title="点赞"
+                    >
+                      <Heart
+                        size={16}
+                        className={note.isLiked ? 'fill-primary text-primary' : 'text-outline'}
+                      />
+                      <span className="font-bold text-[11px]">{note.likes}</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </article>
-          );
-        })}
+              </article>
+            );
+          })
+        )}
       </section>
 
       {/* Decorative Bottom Mascot */}

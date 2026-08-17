@@ -8,6 +8,7 @@ export interface RoomInfo {
   catName: string;
   startDate: string;
   avatarUrl: string;
+  heroImage?: string;
   createdAt?: string;
   isCloudOnline?: boolean;
 }
@@ -62,6 +63,7 @@ export interface UserSettings {
   partner2: string;
   catName: string;
   avatarUrl: string;
+  heroImage?: string;
   soundEnabled: boolean;
   darkMode: boolean;
 }

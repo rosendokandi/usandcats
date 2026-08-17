@@ -114,6 +114,7 @@ export const SettingsModal: React.FC = () => {
                 type="text"
                 value={formData.partner1}
                 onChange={(e) => setFormData({ ...formData, partner1: e.target.value })}
+                placeholder="例如：Alex"
                 className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-body text-sm focus:outline-none focus:border-primary"
                 required
               />
@@ -126,6 +127,7 @@ export const SettingsModal: React.FC = () => {
                 type="text"
                 value={formData.partner2}
                 onChange={(e) => setFormData({ ...formData, partner2: e.target.value })}
+                placeholder="例如：Jamie"
                 className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-body text-sm focus:outline-none focus:border-primary"
                 required
               />
@@ -141,8 +143,23 @@ export const SettingsModal: React.FC = () => {
               type="text"
               value={formData.catName}
               onChange={(e) => setFormData({ ...formData, catName: e.target.value })}
+              placeholder="例如：Mochi"
               className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-body text-sm focus:outline-none focus:border-primary"
               required
+            />
+          </div>
+
+          {/* Hero Image Custom URL */}
+          <div>
+            <label className="block text-on-surface-variant dark:text-surface-dim uppercase mb-1 font-bold">
+              首页情侣合照主图直链 (选填)
+            </label>
+            <input
+              type="url"
+              value={formData.heroImage || ''}
+              onChange={(e) => setFormData({ ...formData, heroImage: e.target.value })}
+              placeholder="粘贴合照图片链接，留空则展示默认插画..."
+              className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-body text-xs focus:outline-none focus:border-primary"
             />
           </div>
 
