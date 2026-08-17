@@ -23,21 +23,37 @@ export const GatePage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
   
-  // Create Room State
-  const [partner1, setPartner1] = useState(settings.partner1 || 'Alex');
-  const [partner2, setPartner2] = useState(settings.partner2 || 'Jamie');
-  const [anniversary, setAnniversary] = useState(settings.startDate || '2023-05-20');
-  const [catName, setCatName] = useState(settings.catName || 'Mochi');
+  // Create Room State - Default 100% empty with gray placeholders
+  const [partner1, setPartner1] = useState('');
+  const [partner2, setPartner2] = useState('');
+  const [anniversary, setAnniversary] = useState('');
+  const [catName, setCatName] = useState('');
   const [createPassword, setCreatePassword] = useState('');
   const [createdRoomCode, setCreatedRoomCode] = useState<string | null>(null);
   
-  // Join Room State
+  // Join Room State - Default 100% empty with gray placeholders
   const [joinRoomCode, setJoinRoomCode] = useState(urlRoomId ? urlRoomId.toUpperCase() : '');
   const [joinPassword, setJoinPassword] = useState('');
   
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // Clear all inputs when not logged in or after exiting room
+  useEffect(() => {
+    if (!currentRoom) {
+      setPartner1('');
+      setPartner2('');
+      setAnniversary('');
+      setCatName('');
+      setCreatePassword('');
+      setCreatedRoomCode(null);
+      if (!urlRoomId) {
+        setJoinRoomCode('');
+      }
+      setJoinPassword('');
+    }
+  }, [currentRoom, urlRoomId]);
 
   // If visiting /room/:roomId directly, switch to join tab
   useEffect(() => {
@@ -50,6 +66,16 @@ export const GatePage: React.FC = () => {
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    if (!partner1.trim() || !partner2.trim()) {
+      setErrorMessage('请输入伴侣双方的昵称');
+      return;
+    }
+
+    if (!anniversary) {
+      setErrorMessage('请选择恋爱起始纪念日');
+      return;
+    }
 
     if (!createPassword || createPassword.length < 4) {
       setErrorMessage('请设置至少 4 位数专属私密密码');
@@ -66,7 +92,7 @@ export const GatePage: React.FC = () => {
       passwordHash: passHash,
       partner1: partner1.trim(),
       partner2: partner2.trim(),
-      catName: catName.trim(),
+      catName: catName.trim() || 'Mochi',
       startDate: anniversary,
       avatarUrl: settings.avatarUrl,
       isCloudOnline: true,
@@ -102,6 +128,11 @@ export const GatePage: React.FC = () => {
 
     if (!joinRoomCode.trim()) {
       setErrorMessage('请输入房间暗号');
+      return;
+    }
+
+    if (!joinPassword) {
+      setErrorMessage('请输入私密密码');
       return;
     }
 
@@ -289,7 +320,7 @@ export const GatePage: React.FC = () => {
                       value={partner1}
                       onChange={(e) => setPartner1(e.target.value)}
                       placeholder="例如：Alex"
-                      className="w-full bg-surface border-2 border-pixel-outline p-2.5 font-body text-sm focus:outline-none focus:border-primary"
+                      className="w-full bg-surface border-2 border-pixel-outline p-2.5 font-body text-sm placeholder:text-outline/50 focus:outline-none focus:border-primary"
                       required
                     />
                   </div>
@@ -302,7 +333,7 @@ export const GatePage: React.FC = () => {
                       value={partner2}
                       onChange={(e) => setPartner2(e.target.value)}
                       placeholder="例如：Jamie"
-                      className="w-full bg-surface border-2 border-pixel-outline p-2.5 font-body text-sm focus:outline-none focus:border-primary"
+                      className="w-full bg-surface border-2 border-pixel-outline p-2.5 font-body text-sm placeholder:text-outline/50 focus:outline-none focus:border-primary"
                       required
                     />
                   </div>
@@ -317,20 +348,20 @@ export const GatePage: React.FC = () => {
                       type="date"
                       value={anniversary}
                       onChange={(e) => setAnniversary(e.target.value)}
-                      className="w-full bg-surface border-2 border-pixel-outline p-2 font-pixel text-xs focus:outline-none focus:border-primary"
+                      className="w-full bg-surface border-2 border-pixel-outline p-2 font-pixel text-xs placeholder:text-outline/50 focus:outline-none focus:border-primary"
                       required
                     />
                   </div>
                   <div>
                     <label className="block text-pixel-outline dark:text-surface-dim font-bold mb-1">
-                      猫咪/宠物名字
+                      猫咪/宠物名字（选填）
                     </label>
                     <input
                       type="text"
                       value={catName}
                       onChange={(e) => setCatName(e.target.value)}
                       placeholder="例如：Mochi"
-                      className="w-full bg-surface border-2 border-pixel-outline p-2.5 font-body text-sm focus:outline-none focus:border-primary"
+                      className="w-full bg-surface border-2 border-pixel-outline p-2.5 font-body text-sm placeholder:text-outline/50 focus:outline-none focus:border-primary"
                     />
                   </div>
                 </div>
@@ -344,8 +375,8 @@ export const GatePage: React.FC = () => {
                     maxLength={12}
                     value={createPassword}
                     onChange={(e) => setCreatePassword(e.target.value)}
-                    placeholder="••••••"
-                    className="w-full bg-surface border-2 border-pixel-outline p-3 font-pixel text-center text-base tracking-[0.5em] focus:outline-none focus:border-primary"
+                    placeholder="请输入6位私密密码"
+                    className="w-full bg-surface border-2 border-pixel-outline p-3 font-pixel text-center text-sm tracking-[0.3em] placeholder:tracking-normal placeholder:text-outline/50 focus:outline-none focus:border-primary"
                     required
                   />
                 </div>
@@ -413,7 +444,7 @@ export const GatePage: React.FC = () => {
                     value={joinRoomCode}
                     onChange={(e) => setJoinRoomCode(e.target.value.toUpperCase())}
                     placeholder="例如：LOVE-520"
-                    className="w-full bg-surface border-2 border-pixel-outline p-3 font-pixel text-center text-lg uppercase tracking-widest focus:outline-none focus:border-primary"
+                    className="w-full bg-surface border-2 border-pixel-outline p-3 font-pixel text-center text-lg uppercase tracking-widest placeholder:tracking-normal placeholder:text-outline/50 focus:outline-none focus:border-primary"
                     required
                   />
                 </div>
@@ -426,8 +457,8 @@ export const GatePage: React.FC = () => {
                     type="password"
                     value={joinPassword}
                     onChange={(e) => setJoinPassword(e.target.value)}
-                    placeholder="••••••"
-                    className="w-full bg-surface border-2 border-pixel-outline p-3 font-pixel text-center text-lg tracking-[0.5em] focus:outline-none focus:border-primary"
+                    placeholder="请输入私密密码"
+                    className="w-full bg-surface border-2 border-pixel-outline p-3 font-pixel text-center text-base tracking-[0.3em] placeholder:tracking-normal placeholder:text-outline/50 focus:outline-none focus:border-primary"
                     required
                   />
                 </div>

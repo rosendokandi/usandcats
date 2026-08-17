@@ -6,8 +6,8 @@
 ---
 
 ## 📌 当前版本信息 (Current Version)
-- **当前版本号**：`v1.4.0`
-- **版本状态**：🔒 严格隐私门禁守卫与像素确认弹窗版 (Strict Route Privacy Guard & Retro Confirm Modal)
+- **当前版本号**：`v1.4.1`
+- **版本状态**：🔒 门禁表单纯净占位符与隐私安全强化版 (Clean Input Placeholders & Strict Privacy Hardened)
 - **发布日期**：2026-08-17
 
 ---
