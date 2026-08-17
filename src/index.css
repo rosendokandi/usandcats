@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #fff8f7;
+    background-image: 
+      linear-gradient(to right, rgba(210, 195, 196, 0.35) 2px, transparent 2px),
+      linear-gradient(to bottom, rgba(210, 195, 196, 0.35) 2px, transparent 2px);
+    background-size: 32px 32px;
+    background-position: center top;
+    background-attachment: fixed;
+    image-rendering: pixelated;
+  }
+
+  .dark body {
+    background-color: #1e1927;
+    background-image: 
+      linear-gradient(to right, rgba(87, 65, 68, 0.35) 2px, transparent 2px),
+      linear-gradient(to bottom, rgba(87, 65, 68, 0.35) 2px, transparent 2px);
+    color: #fff8f7;
+  }
+}
+
+/* Material Symbols fill class */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  user-select: none;
+}
+
+.material-symbols-outlined.outlined-only {
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Pixel Component Utilities */
+.pixel-border {
+  border: 4px solid #574144;
+}
+
+.pixel-border-sm {
+  border: 2px solid #574144;
+}
+
+.pixel-shadow {
+  box-shadow: 4px 4px 0px 0px #574144;
+}
+
+.pixel-shadow-sm {
+  box-shadow: 2px 2px 0px 0px #574144;
+}
+
+.pixel-shadow-lg {
+  box-shadow: 6px 6px 0px 0px #574144;
+}
+
+.pixel-btn {
+  border: 4px solid #574144;
+  box-shadow: 4px 4px 0px 0px #574144;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
+  user-select: none;
+}
+
+.pixel-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #574144;
+}
+
+.pixel-btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px 0px #574144;
+}
+
+.pixel-btn-sm {
+  border: 2px solid #574144;
+  box-shadow: 2px 2px 0px 0px #574144;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  user-select: none;
+}
+
+.pixel-btn-sm:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px 0px #574144;
+}
+
+.pixel-btn-sm:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #574144;
+}
+
+/* Chunky stepped border for Hero Photo */
+.stepped-border {
+  position: relative;
+  box-shadow: 
+    -4px 0 0 0 #574144,
+    4px 0 0 0 #574144,
+    0 -4px 0 0 #574144,
+    0 4px 0 0 #574144,
+    -8px -4px 0 0 #574144,
+    8px -4px 0 0 #574144,
+    -8px 4px 0 0 #574144,
+    8px 4px 0 0 #574144;
+}
+
+/* Polaroid Card */
+.polaroid-card {
+  box-shadow: 6px 6px 0px 0px #574144;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.polaroid-card:hover {
+  transform: translateY(-6px) rotate(-0.5deg);
+  box-shadow: 10px 10px 0px 0px #574144;
+}
+
+/* Tape sticker decoration */
+.tape {
+  background: #fbdbde;
+  border: 2px solid #574144;
+  box-shadow: 2px 2px 0px 0px rgba(87, 65, 68, 0.2);
+}
+
+.tape-mint {
+  background: #d6e6d7;
+  border: 2px solid #574144;
+  box-shadow: 2px 2px 0px 0px rgba(87, 65, 68, 0.2);
+}
+
+.tape-lavender {
+  background: #e1e1f5;
+  border: 2px solid #574144;
+  box-shadow: 2px 2px 0px 0px rgba(87, 65, 68, 0.2);
+}
+
+/* Sticky Note tape header */
+.sticky-note-header::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 18px;
+  background-color: #ede7e6;
+  border: 3px solid #574144;
+  z-index: 10;
+}
+
+/* Floating animation */
+@keyframes pixel-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-pixel-float {
+  animation: pixel-float 3s ease-in-out infinite;
+}
+
+@keyframes cat-purr {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04) translateY(-2px);
+  }
+}
+
+.animate-cat-purr {
+  animation: cat-purr 1.2s ease-in-out infinite;
+}
+
+/* Pixel Dialog speech bubble */
+.pixel-bubble-tail {
+  position: absolute;
+  bottom: -16px;
+  left: 32px;
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 16px solid #574144;
+}
+
+.pixel-bubble-tail::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: -10px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 12px solid #ffffff;
+}
+
+/* Timeline central line */
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    #574144,
+    #574144 12px,
+    transparent 12px,
+    transparent 20px
+  );
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .timeline-line {
+    left: 28px;
+    transform: none;
+  }
+}
