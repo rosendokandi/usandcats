@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { X, Save, RotateCcw, Volume2, VolumeX, Moon, Sun, Radio, LogOut } from 'lucide-react';
+import { X, Save, Volume2, VolumeX, Moon, Sun, Radio, LogOut } from 'lucide-react';
 import { sound } from '../utils/sound';
 
 const PRESET_AVATARS = [
@@ -12,15 +11,13 @@ const PRESET_AVATARS = [
 ];
 
 export const SettingsModal: React.FC = () => {
-  const navigate = useNavigate();
   const { 
     isSettingsOpen, 
     setIsSettingsOpen, 
     settings, 
     updateSettings, 
     currentRoom, 
-    setCurrentRoom,
-    setRealtimeToast
+    setIsExitModalOpen
   } = useApp();
   
   const [formData, setFormData] = useState(settings);
@@ -34,35 +31,25 @@ export const SettingsModal: React.FC = () => {
     setIsSettingsOpen(false);
   };
 
-  const handleLeaveRoom = () => {
-    if (!currentRoom) return;
+  const handleOpenExitConfirm = () => {
     sound.playClick();
-    if (window.confirm(`确定要退出当前房间【${currentRoom.roomId}】吗？\n退出后将切回本地单机模式。`)) {
-      setCurrentRoom(null);
-      setIsSettingsOpen(false);
-      setRealtimeToast({
-        id: `${Date.now()}`,
-        message: '已成功退出房间，当前为单机模式',
-        type: 'join'
-      });
-      navigate('/gate');
-    }
+    setIsExitModalOpen(true);
   };
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
       onClick={() => {
         sound.playClick();
         setIsSettingsOpen(false);
       }}
     >
       <div 
-        className="relative w-full max-w-lg bg-surface dark:bg-inverse-surface pixel-border p-6 md:p-8 pixel-shadow-lg text-on-surface dark:text-inverse-on-surface max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-lg bg-surface dark:bg-inverse-surface pixel-border p-5 sm:p-7 pixel-shadow-lg text-on-surface dark:text-inverse-on-surface max-h-[88vh] overflow-y-auto overflow-x-hidden my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Tape Header */}
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-primary-fixed border-2 border-pixel-outline rotate-[1deg]"></div>
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-5 bg-primary-fixed border-2 border-pixel-outline rotate-[1deg] z-10"></div>
 
         {/* Close button */}
         <button
@@ -70,31 +57,31 @@ export const SettingsModal: React.FC = () => {
             sound.playClick();
             setIsSettingsOpen(false);
           }}
-          className="absolute -top-3 -right-3 pixel-btn-sm p-1.5 bg-primary text-on-primary hover:bg-error"
+          className="absolute top-3 right-3 pixel-btn-sm p-1.5 bg-surface-container hover:bg-error hover:text-white transition-colors z-20"
           title="关闭"
         >
           <X size={16} />
         </button>
 
         {/* Title */}
-        <div className="flex items-center gap-2 mb-4 border-b-2 border-pixel-outline pb-3">
+        <div className="flex items-center gap-2 mb-4 border-b-2 border-pixel-outline pb-3 pr-8">
           <span className="material-symbols-outlined text-primary text-2xl">settings</span>
-          <h2 className="font-pixel text-lg text-primary dark:text-primary-fixed font-bold uppercase">
+          <h2 className="font-pixel text-base sm:text-lg text-primary dark:text-primary-fixed font-bold uppercase tracking-tight">
             空间个性化设置
           </h2>
         </div>
 
         {/* Current Room Section */}
         {currentRoom && (
-          <div className="mb-4 bg-tertiary-container/80 text-tertiary pixel-border-sm p-3 font-pixel text-xs flex items-center justify-between">
+          <div className="mb-4 bg-tertiary-container text-tertiary pixel-border-sm p-3 font-pixel text-xs flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <Radio size={14} className="animate-spin" />
               <span>当前房间：<b>{currentRoom.roomId}</b></span>
             </div>
             <button
               type="button"
-              onClick={handleLeaveRoom}
-              className="text-error hover:underline flex items-center gap-1 font-bold"
+              onClick={handleOpenExitConfirm}
+              className="text-error hover:underline flex items-center gap-1 font-bold ml-2"
             >
               <LogOut size={13} />
               <span>退出房间</span>
@@ -118,7 +105,7 @@ export const SettingsModal: React.FC = () => {
           </div>
 
           {/* Couple Names */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-on-surface-variant dark:text-surface-dim uppercase mb-1 font-bold">
                 伴侣 1 昵称
@@ -127,7 +114,7 @@ export const SettingsModal: React.FC = () => {
                 type="text"
                 value={formData.partner1}
                 onChange={(e) => setFormData({ ...formData, partner1: e.target.value })}
-                className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-pixel text-xs focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-body text-sm focus:outline-none focus:border-primary"
                 required
               />
             </div>
@@ -139,7 +126,7 @@ export const SettingsModal: React.FC = () => {
                 type="text"
                 value={formData.partner2}
                 onChange={(e) => setFormData({ ...formData, partner2: e.target.value })}
-                className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-pixel text-xs focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-body text-sm focus:outline-none focus:border-primary"
                 required
               />
             </div>
@@ -154,7 +141,7 @@ export const SettingsModal: React.FC = () => {
               type="text"
               value={formData.catName}
               onChange={(e) => setFormData({ ...formData, catName: e.target.value })}
-              className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-pixel text-xs focus:outline-none focus:border-primary"
+              className="w-full bg-surface-container dark:bg-surface-container-high border-2 border-pixel-outline p-2.5 font-body text-sm focus:outline-none focus:border-primary"
               required
             />
           </div>
@@ -164,7 +151,7 @@ export const SettingsModal: React.FC = () => {
             <label className="block text-on-surface-variant dark:text-surface-dim uppercase mb-2 font-bold">
               选择情侣专属头像
             </label>
-            <div className="flex gap-3 items-center">
+            <div className="flex gap-3 items-center flex-wrap">
               {PRESET_AVATARS.map((url, idx) => (
                 <button
                   type="button"
@@ -183,11 +170,11 @@ export const SettingsModal: React.FC = () => {
           </div>
 
           {/* Toggles: Sound & Dark Mode */}
-          <div className="grid grid-cols-2 gap-3 pt-2">
+          <div className="grid grid-cols-2 gap-3 pt-1">
             <button
               type="button"
               onClick={() => setFormData({ ...formData, soundEnabled: !formData.soundEnabled })}
-              className={`p-3 pixel-border-sm flex items-center justify-between transition-colors ${
+              className={`p-2.5 pixel-border-sm flex items-center justify-between transition-colors ${
                 formData.soundEnabled ? 'bg-primary-container text-primary font-bold' : 'bg-surface-container'
               }`}
             >
@@ -198,7 +185,7 @@ export const SettingsModal: React.FC = () => {
             <button
               type="button"
               onClick={() => setFormData({ ...formData, darkMode: !formData.darkMode })}
-              className={`p-3 pixel-border-sm flex items-center justify-between transition-colors ${
+              className={`p-2.5 pixel-border-sm flex items-center justify-between transition-colors ${
                 formData.darkMode ? 'bg-primary-container text-primary font-bold' : 'bg-surface-container'
               }`}
             >
@@ -212,15 +199,13 @@ export const SettingsModal: React.FC = () => {
             <button
               type="button"
               onClick={() => {
-                if (confirm('确定要重置所有记忆数据恢复出厂设置吗？')) {
-                  localStorage.clear();
-                  window.location.reload();
-                }
+                sound.playClick();
+                handleOpenExitConfirm();
               }}
-              className="pixel-btn-sm px-3 py-2 bg-surface text-error hover:bg-error-container flex items-center gap-1.5"
+              className="pixel-btn-sm px-3 py-2 bg-surface text-error hover:bg-error-container flex items-center gap-1.5 font-bold"
             >
-              <RotateCcw size={14} />
-              <span>重置数据</span>
+              <LogOut size={14} />
+              <span>退出房间</span>
             </button>
 
             <button

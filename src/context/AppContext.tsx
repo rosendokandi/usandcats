@@ -28,6 +28,9 @@ interface AppContextType {
   // Room & Cloud Sync
   currentRoom: RoomInfo | null;
   setCurrentRoom: (room: RoomInfo | null) => void;
+  exitRoom: () => void;
+  isExitModalOpen: boolean;
+  setIsExitModalOpen: (open: boolean) => void;
   isRoomModalOpen: boolean;
   setIsRoomModalOpen: (open: boolean) => void;
   realtimeToast: RealtimeToastMsg | null;
@@ -66,14 +69,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Determine initial tab: if URL contains gate or room invite, or no room saved, default to gate
-  const [currentTab, setCurrentTabState] = useState<TabType>(() => {
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash;
-      if (hash.includes('gate') || hash.includes('room=')) return 'gate';
-    }
-    const savedRoom = localStorage.getItem('us_cats_room');
-    return savedRoom ? 'home' : 'gate';
-  });
+  const [currentTab, setCurrentTabState] = useState<TabType>('gate');
 
   // Room state
   const [currentRoom, setCurrentRoomState] = useState<RoomInfo | null>(() => {
@@ -81,6 +77,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
   const [realtimeToast, setRealtimeToast] = useState<RealtimeToastMsg | null>(null);
 
@@ -124,6 +121,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  // Safe Exit Room Function (Completely wipes out private room data)
+  const exitRoom = useCallback(() => {
+    setCurrentRoom(null);
+    setMilestones(DEFAULT_MILESTONES);
+    setMemories(DEFAULT_MEMORIES);
+    setLoveNotes(DEFAULT_LOVE_NOTES);
+    setSettings(DEFAULT_SETTINGS);
+
+    localStorage.removeItem('us_cats_room');
+    localStorage.removeItem('us_cats_milestones');
+    localStorage.removeItem('us_cats_memories');
+    localStorage.removeItem('us_cats_notes');
+    localStorage.removeItem('us_cats_settings');
+
+    setIsExitModalOpen(false);
+    setIsSettingsOpen(false);
+    setIsRoomModalOpen(false);
+    
+    setRealtimeToast({
+      id: `${Date.now()}`,
+      message: '已安全退出房间，所有私密数据已完全清空！🔒',
+      type: 'join',
+    });
+  }, []);
+
   // Sync sound setting
   useEffect(() => {
     sound.enabled = settings.soundEnabled;
@@ -138,22 +160,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [settings.darkMode]);
 
-  // LocalStorage Persist
+  // LocalStorage Persist only if user is in a valid room
   useEffect(() => {
-    localStorage.setItem('us_cats_settings', JSON.stringify(settings));
-  }, [settings]);
+    if (currentRoom) {
+      localStorage.setItem('us_cats_settings', JSON.stringify(settings));
+    }
+  }, [settings, currentRoom]);
 
   useEffect(() => {
-    localStorage.setItem('us_cats_milestones', JSON.stringify(milestones));
-  }, [milestones]);
+    if (currentRoom) {
+      localStorage.setItem('us_cats_milestones', JSON.stringify(milestones));
+    }
+  }, [milestones, currentRoom]);
 
   useEffect(() => {
-    localStorage.setItem('us_cats_memories', JSON.stringify(memories));
-  }, [memories]);
+    if (currentRoom) {
+      localStorage.setItem('us_cats_memories', JSON.stringify(memories));
+    }
+  }, [memories, currentRoom]);
 
   useEffect(() => {
-    localStorage.setItem('us_cats_notes', JSON.stringify(loveNotes));
-  }, [loveNotes]);
+    if (currentRoom) {
+      localStorage.setItem('us_cats_notes', JSON.stringify(loveNotes));
+    }
+  }, [loveNotes, currentRoom]);
 
   // Load cloud data for room
   const loadCloudDataForRoom = useCallback(async (roomId: string) => {
@@ -451,6 +481,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         timeTogetherDetails: timeDetails,
         currentRoom,
         setCurrentRoom,
+        exitRoom,
+        isExitModalOpen,
+        setIsExitModalOpen,
         isRoomModalOpen,
         setIsRoomModalOpen,
         realtimeToast,

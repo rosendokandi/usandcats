@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Volume2, VolumeX, Settings, Heart, Radio, DoorOpen, LogOut } from 'lucide-react';
+import { Volume2, VolumeX, Settings, Heart, Radio, LogOut } from 'lucide-react';
 import { sound } from '../utils/sound';
 
 export const Header: React.FC = () => {
@@ -14,8 +14,7 @@ export const Header: React.FC = () => {
     setIsSettingsOpen, 
     triggerHeartShower,
     currentRoom,
-    setCurrentRoom,
-    setRealtimeToast
+    setIsExitModalOpen
   } = useApp();
 
   const navItems = [
@@ -27,20 +26,10 @@ export const Header: React.FC = () => {
 
   const currentPath = location.pathname === '/' ? '/home' : location.pathname;
 
-  const handleLeaveRoom = (e: React.MouseEvent) => {
+  const handleOpenExitModal = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!currentRoom) return;
-    
     sound.playClick();
-    if (window.confirm(`确定要退出当前房间【${currentRoom.roomId}】吗？\n退出后将切回本地单机模式。`)) {
-      setCurrentRoom(null);
-      setRealtimeToast({
-        id: `${Date.now()}`,
-        message: '已成功退出房间，当前为单机模式',
-        type: 'join'
-      });
-      navigate('/gate');
-    }
+    setIsExitModalOpen(true);
   };
 
   return (
@@ -56,8 +45,8 @@ export const Header: React.FC = () => {
             <span className="tracking-wide">US & CATS</span>
           </button>
 
-          {/* Room / Gate Badge with Exit action */}
-          {currentRoom ? (
+          {/* Room Badge with Pixel Exit Trigger */}
+          {currentRoom && (
             <div className="flex items-center bg-tertiary-container pixel-border-sm font-pixel text-[11px] text-tertiary">
               <button
                 onClick={() => navigate('/gate')}
@@ -69,22 +58,13 @@ export const Header: React.FC = () => {
                 <span>{currentRoom.roomId}</span>
               </button>
               <button
-                onClick={handleLeaveRoom}
+                onClick={handleOpenExitModal}
                 className="px-1.5 py-1 text-error hover:bg-error hover:text-white border-l border-pixel-outline/30 transition-colors"
                 title="退出当前房间"
               >
                 <LogOut size={12} />
               </button>
             </div>
-          ) : (
-            <button
-              onClick={() => navigate('/gate')}
-              className="font-pixel text-[11px] px-2.5 py-1 pixel-border-sm flex items-center gap-1.5 transition-all cursor-pointer bg-surface-container text-outline hover:bg-primary-container hover:text-primary"
-              title="点击前往情侣专属门禁大厅"
-            >
-              <DoorOpen size={12} />
-              <span>秘密小屋门禁</span>
-            </button>
           )}
         </div>
 

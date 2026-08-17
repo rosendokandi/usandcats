@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Home, Key, Copy, Check, Sparkles, DoorOpen, ArrowRight, Radio, LogOut } from 'lucide-react';
+import { Home, Key, Copy, Check, Sparkles, DoorOpen, ArrowRight, Radio, LogOut, ShieldCheck } from 'lucide-react';
 import { sound } from '../utils/sound';
 import { hashPasscode, createCloudRoom, joinCloudRoom } from '../utils/cloudSync';
 import { fireBigCelebration } from '../utils/confetti';
@@ -18,7 +18,7 @@ export const GatePage: React.FC = () => {
     settings,
     updateSettings,
     loadCloudDataForRoom,
-    setRealtimeToast
+    setIsExitModalOpen
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
@@ -130,20 +130,6 @@ export const GatePage: React.FC = () => {
     }
   };
 
-  const handleLeaveRoom = () => {
-    if (!currentRoom) return;
-    sound.playClick();
-    if (window.confirm(`确定要退出当前房间【${currentRoom.roomId}】吗？\n退出后将切回本地单机模式。`)) {
-      setCurrentRoom(null);
-      setCreatedRoomCode(null);
-      setRealtimeToast({
-        id: `${Date.now()}`,
-        message: '已成功退出房间，当前为单机模式',
-        type: 'join'
-      });
-    }
-  };
-
   const handleCopyInvite = () => {
     sound.playClick();
     const targetRoom = createdRoomCode || currentRoom?.roomId;
@@ -158,10 +144,7 @@ export const GatePage: React.FC = () => {
     <div className="min-h-screen flex flex-col justify-between relative bg-surface text-on-surface">
       {/* Top Header */}
       <header className="flex justify-between items-center w-full px-4 md:px-margin-desktop max-w-7xl mx-auto h-20 pt-4 z-50">
-        <div 
-          onClick={() => navigate('/home')}
-          className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity"
-        >
+        <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-primary text-3xl">pets</span>
           <span className="font-pixel text-xl md:text-2xl text-primary font-bold tracking-tight">
             US & CATS
@@ -182,7 +165,10 @@ export const GatePage: React.FC = () => {
               <ArrowRight size={14} />
             </button>
             <button
-              onClick={handleLeaveRoom}
+              onClick={() => {
+                sound.playClick();
+                setIsExitModalOpen(true);
+              }}
               className="pixel-btn-sm px-2.5 py-1.5 bg-surface text-error hover:bg-error hover:text-white font-pixel text-xs flex items-center gap-1 font-bold transition-colors"
               title="退出当前房间"
             >
@@ -217,7 +203,7 @@ export const GatePage: React.FC = () => {
 
           {/* Current Room Active Status Card */}
           {currentRoom && (
-            <div className="mt-4 bg-tertiary-container/80 text-tertiary pixel-border-sm p-3 font-pixel text-xs flex items-center gap-3 animate-fadeIn">
+            <div className="mt-4 bg-tertiary-container/80 text-tertiary pixel-border-sm p-3 font-pixel text-xs flex items-center gap-3 animate-fadeIn flex-wrap justify-center">
               <span className="font-bold flex items-center gap-1">
                 <Radio size={14} className="animate-spin" />
                 当前已连接房间：<b>{currentRoom.roomId}</b>
@@ -230,8 +216,11 @@ export const GatePage: React.FC = () => {
                 <span>{copied ? '已复制' : '复制邀请链接'}</span>
               </button>
               <button
-                onClick={handleLeaveRoom}
-                className="text-error hover:underline flex items-center gap-0.5 ml-2 font-bold"
+                onClick={() => {
+                  sound.playClick();
+                  setIsExitModalOpen(true);
+                }}
+                className="text-error hover:underline flex items-center gap-0.5 ml-1 font-bold"
               >
                 <LogOut size={13} />
                 <span>退出房间</span>
@@ -456,18 +445,10 @@ export const GatePage: React.FC = () => {
           </div>
         </section>
 
-        {/* Bottom Link */}
-        <div className="mt-8 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              sound.playClick();
-              navigate('/home');
-            }}
-            className="font-body text-xs md:text-sm text-on-surface-variant dark:text-surface-dim hover:text-primary underline decoration-2 underline-offset-4"
-          >
-            先以单机模式随意看看（无需房间）→
-          </button>
+        {/* Security Badge */}
+        <div className="mt-8 flex items-center gap-1.5 text-outline font-pixel text-[11px]">
+          <ShieldCheck size={14} className="text-tertiary" />
+          <span>房间加密隔离 · 仅持有暗号与密码的情侣双方可进入</span>
         </div>
       </main>
 
