@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { HERO_IMAGE } from '../utils/defaultData';
 import { InteractiveCat } from '../components/InteractiveCat';
@@ -6,10 +7,10 @@ import { ArrowRight, BookOpen, MessageSquareHeart } from 'lucide-react';
 import { sound } from '../utils/sound';
 
 export const HomePage: React.FC = () => {
+  const navigate = useNavigate();
   const { 
     daysTogether, 
     timeTogetherDetails, 
-    setCurrentTab, 
     memories, 
     milestones, 
     loveNotes,
@@ -37,6 +38,12 @@ export const HomePage: React.FC = () => {
     }, 25);
     return () => clearInterval(timer);
   }, [daysTogether]);
+
+  const handleNav = (path: string) => {
+    sound.playClick();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate(path);
+  };
 
   return (
     <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-margin-desktop py-10 md:py-16 w-full max-w-5xl mx-auto gap-8 md:gap-12">
@@ -108,7 +115,7 @@ export const HomePage: React.FC = () => {
       {/* CTA Navigation Buttons */}
       <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
         <button
-          onClick={() => setCurrentTab('memories')}
+          onClick={() => handleNav('/memories')}
           className="pixel-btn bg-primary text-on-primary font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2.5 hover:bg-primary/90"
         >
           <span>查看甜蜜相册</span>
@@ -116,7 +123,7 @@ export const HomePage: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setCurrentTab('story')}
+          onClick={() => handleNav('/story')}
           className="pixel-btn bg-surface dark:bg-inverse-surface text-primary dark:text-primary-fixed font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2.5 hover:bg-primary-container"
         >
           <BookOpen size={16} />
@@ -124,7 +131,7 @@ export const HomePage: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setCurrentTab('notes')}
+          onClick={() => handleNav('/notes')}
           className="pixel-btn bg-tertiary-container text-tertiary font-pixel text-xs md:text-sm px-6 py-3.5 flex items-center gap-2.5 hover:opacity-90"
         >
           <MessageSquareHeart size={16} />
@@ -135,7 +142,7 @@ export const HomePage: React.FC = () => {
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-3 gap-3 sm:gap-6 w-full max-w-xl mt-4">
         <div 
-          onClick={() => setCurrentTab('story')}
+          onClick={() => handleNav('/story')}
           className="bg-surface-container-lowest dark:bg-inverse-surface pixel-border p-3 sm:p-4 text-center pixel-shadow-sm cursor-pointer hover:-translate-y-1 transition-transform"
         >
           <div className="text-xl sm:text-2xl font-bold font-pixel text-primary dark:text-primary-fixed">
@@ -147,7 +154,7 @@ export const HomePage: React.FC = () => {
         </div>
 
         <div 
-          onClick={() => setCurrentTab('memories')}
+          onClick={() => handleNav('/memories')}
           className="bg-surface-container-lowest dark:bg-inverse-surface pixel-border p-3 sm:p-4 text-center pixel-shadow-sm cursor-pointer hover:-translate-y-1 transition-transform"
         >
           <div className="text-xl sm:text-2xl font-bold font-pixel text-primary dark:text-primary-fixed">
@@ -159,7 +166,7 @@ export const HomePage: React.FC = () => {
         </div>
 
         <div 
-          onClick={() => setCurrentTab('notes')}
+          onClick={() => handleNav('/notes')}
           className="bg-surface-container-lowest dark:bg-inverse-surface pixel-border p-3 sm:p-4 text-center pixel-shadow-sm cursor-pointer hover:-translate-y-1 transition-transform"
         >
           <div className="text-xl sm:text-2xl font-bold font-pixel text-primary dark:text-primary-fixed">

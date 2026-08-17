@@ -1,12 +1,13 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { TabType } from '../types';
 import { Volume2, VolumeX, Settings, Heart, Radio, DoorOpen } from 'lucide-react';
 
 export const Header: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const { 
-    currentTab, 
-    setCurrentTab, 
     settings, 
     updateSettings, 
     setIsSettingsOpen, 
@@ -14,12 +15,14 @@ export const Header: React.FC = () => {
     currentRoom
   } = useApp();
 
-  const navItems: { key: TabType; label: string }[] = [
-    { key: 'home', label: '首页' },
-    { key: 'story', label: '我们的故事' },
-    { key: 'memories', label: '甜蜜瞬间' },
-    { key: 'notes', label: '小情书' },
+  const navItems = [
+    { path: '/home', label: '首页' },
+    { path: '/story', label: '我们的故事' },
+    { path: '/memories', label: '甜蜜瞬间' },
+    { path: '/notes', label: '小情书' },
   ];
+
+  const currentPath = location.pathname === '/' ? '/home' : location.pathname;
 
   return (
     <header className="bg-surface/95 dark:bg-inverse-surface/95 border-b-4 border-pixel-outline pixel-shadow w-full sticky top-0 z-40 backdrop-blur-sm transition-colors">
@@ -27,7 +30,7 @@ export const Header: React.FC = () => {
         {/* Brand Logo & Room Badge */}
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => setCurrentTab('home')}
+            onClick={() => navigate('/home')}
             className="font-pixel text-headline-md text-primary dark:text-primary-fixed flex items-center gap-2 text-lg md:text-2xl font-bold tracking-tight hover:opacity-90 active:scale-95 transition-all text-left"
           >
             <span className="material-symbols-outlined text-2xl md:text-3xl text-primary dark:text-primary-fixed">pets</span>
@@ -36,7 +39,7 @@ export const Header: React.FC = () => {
 
           {/* Room / Gate Jump Button */}
           <button
-            onClick={() => setCurrentTab('gate')}
+            onClick={() => navigate('/gate')}
             className={`font-pixel text-[11px] px-2.5 py-1 pixel-border-sm flex items-center gap-1.5 transition-all cursor-pointer ${
               currentRoom 
                 ? 'bg-tertiary-container text-tertiary font-bold hover:scale-105' 
@@ -62,11 +65,14 @@ export const Header: React.FC = () => {
         {/* Navigation Links (Desktop) */}
         <nav className="hidden md:flex items-center gap-4 lg:gap-6">
           {navItems.map((item) => {
-            const isActive = currentTab === item.key;
+            const isActive = currentPath === item.path;
             return (
               <button
-                key={item.key}
-                onClick={() => setCurrentTab(item.key)}
+                key={item.path}
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  navigate(item.path);
+                }}
                 className={`font-pixel text-[13px] tracking-wider px-3.5 py-1.5 transition-all pixel-border-sm ${
                   isActive
                     ? 'bg-primary text-on-primary shadow-pixel-sm font-bold scale-105'
@@ -130,11 +136,14 @@ export const Header: React.FC = () => {
       {/* Mobile Navigation Bar */}
       <div className="flex md:hidden border-t-2 border-pixel-outline bg-surface-container dark:bg-surface-container-high px-2 py-1.5 justify-around">
         {navItems.map((item) => {
-          const isActive = currentTab === item.key;
+          const isActive = currentPath === item.path;
           return (
             <button
-              key={item.key}
-              onClick={() => setCurrentTab(item.key)}
+              key={item.path}
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                navigate(item.path);
+              }}
               className={`font-pixel text-[12px] px-2.5 py-1 transition-all ${
                 isActive
                   ? 'bg-primary text-on-primary font-bold pixel-border-sm'

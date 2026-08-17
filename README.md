@@ -6,8 +6,8 @@
 ---
 
 ## 📌 当前版本信息 (Current Version)
-- **当前版本号**：`v1.2.0`
-- **版本状态**：🚀 独立门禁大厅与情侣房间双向实时同步版 (Standalone Room Gate & Realtime Cloud Sync)
+- **当前版本号**：`v1.3.0`
+- **版本状态**：🚀 标准多路由多页面版 (Standard Multi-Page React Router & Cloud Realtime Sync)
 - **发布日期**：2026-08-17
 
 ---
@@ -82,8 +82,16 @@
 
 ---
 
-## ✅ 已实现功能清单 (v1.2.0)
+## ✅ 已实现功能清单 (v1.3.0)
 
+- [x] **标准多路由多页面架构 (React Router DOM)**：
+  - `http://localhost:3000/gate` ➔ 独立门禁大厅（创建/加入房间）
+  - `http://localhost:3000/home` 或 `/` ➔ 首页甜蜜空间
+  - `http://localhost:3000/story` ➔ 我们的故事时间轴
+  - `http://localhost:3000/memories` ➔ 甜蜜拍立得相册
+  - `http://localhost:3000/notes` ➔ 小情书便签留言板
+  - `http://localhost:3000/room/LOVE-520` ➔ 专属房间直达链接
+  - 完美支持浏览器前进/后退与独立页面分享链接。
 - [x] **独立情侣专属秘密小屋门禁大厅**（Stitch 原版 UI 还原：Mochi 金钥匙主图、双 Tab 门禁、专属暗号票据、一键开门跳转与邀请短链）。
 - [x] **Supabase 双向实时同步引擎**（WebSocket 实时广播，写便签/传照片秒级推送到对方屏幕）。
 - [x] **全中文交互支持**（导航、按钮、弹窗表单、标签、小猫对话台词全部中文化）。

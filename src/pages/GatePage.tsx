@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Home, Key, Copy, Check, Sparkles, DoorOpen, ArrowRight, Radio } from 'lucide-react';
 import { sound } from '../utils/sound';
@@ -8,10 +9,12 @@ import { fireBigCelebration } from '../utils/confetti';
 const MOCHI_KEY_HERO = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdZJGwxsR0WzHKqb5h1IHxvcFlXc7a9AhxuD2-xj2YTMpLosRW4uXcSw0CaHMVOjhJvp8AybpiIkuf1QhxUpoLvaj8BUh6F3I6NbX21b8B_gg2dlE1TVoiJWGVmx9yIQXBE6EL6OF1o5CNiqTdjz4PpMBMkvCV_bBPuW7l2xz_LVjMI8orTY8q9IQvfZgAePFa2N6GmWdcjJSIhsL0Smg74JihGPG9ih_9OvKBM7SbNgC1A-8kPgUtvLmAIrlNIf2luwSdk8aQrRQ';
 
 export const GatePage: React.FC = () => {
+  const navigate = useNavigate();
+  const { roomId: urlRoomId } = useParams<{ roomId?: string }>();
+
   const {
     currentRoom,
     setCurrentRoom,
-    setCurrentTab,
     settings,
     updateSettings,
     loadCloudDataForRoom
@@ -28,24 +31,20 @@ export const GatePage: React.FC = () => {
   const [createdRoomCode, setCreatedRoomCode] = useState<string | null>(null);
   
   // Join Room State
-  const [joinRoomCode, setJoinRoomCode] = useState('');
+  const [joinRoomCode, setJoinRoomCode] = useState(urlRoomId ? urlRoomId.toUpperCase() : '');
   const [joinPassword, setJoinPassword] = useState('');
   
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Check URL hash for room invite code (e.g. #room=LOVE-520)
+  // If visiting /room/:roomId directly, switch to join tab
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes('room=')) {
-      const code = hash.split('room=')[1]?.split('&')[0];
-      if (code) {
-        setJoinRoomCode(code.toUpperCase());
-        setActiveTab('join');
-      }
+    if (urlRoomId) {
+      setJoinRoomCode(urlRoomId.toUpperCase());
+      setActiveTab('join');
     }
-  }, []);
+  }, [urlRoomId]);
 
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,10 +120,10 @@ export const GatePage: React.FC = () => {
         avatarUrl: res.room.avatarUrl,
       });
       loadCloudDataForRoom(res.room.roomId);
-      // Enter the main romantic space!
+      // Navigate to /home
       setTimeout(() => {
-        setCurrentTab('home');
-      }, 500);
+        navigate('/home');
+      }, 400);
     } else {
       setErrorMessage(res.error || '加入房间失败，请检查暗号和密码');
     }
@@ -132,7 +131,7 @@ export const GatePage: React.FC = () => {
 
   const handleCopyInvite = () => {
     sound.playClick();
-    const inviteUrl = `${window.location.origin}/#room=${createdRoomCode}`;
+    const inviteUrl = `${window.location.origin}/room/${createdRoomCode}`;
     const text = `亲爱的，快来我们的像素秘密小屋！\n🔗 房间暗号：${createdRoomCode}\n🔑 访问密码：${createPassword}\n直达链接：${inviteUrl}`;
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -143,7 +142,10 @@ export const GatePage: React.FC = () => {
     <div className="min-h-screen flex flex-col justify-between relative bg-surface text-on-surface">
       {/* Top Header */}
       <header className="flex justify-between items-center w-full px-4 md:px-margin-desktop max-w-7xl mx-auto h-20 pt-4 z-50">
-        <div className="flex items-center gap-2">
+        <div 
+          onClick={() => navigate('/home')}
+          className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity"
+        >
           <span className="material-symbols-outlined text-primary text-3xl">pets</span>
           <span className="font-pixel text-xl md:text-2xl text-primary font-bold tracking-tight">
             US & CATS
@@ -152,11 +154,14 @@ export const GatePage: React.FC = () => {
 
         {currentRoom && (
           <button
-            onClick={() => setCurrentTab('home')}
+            onClick={() => {
+              sound.playClick();
+              navigate('/home');
+            }}
             className="pixel-btn-sm px-3 py-1.5 bg-tertiary-container text-tertiary font-pixel text-xs flex items-center gap-1 font-bold"
           >
             <Radio size={14} className="animate-spin" />
-            <span>进入房间 ({currentRoom.roomId})</span>
+            <span>进入小家 ({currentRoom.roomId})</span>
             <ArrowRight size={14} />
           </button>
         )}
@@ -336,14 +341,14 @@ export const GatePage: React.FC = () => {
                           className="flex-1 pixel-btn bg-secondary-container text-secondary py-3 px-4 font-pixel text-xs flex items-center justify-center gap-1.5 hover:opacity-90 font-bold"
                         >
                           {copied ? <Check size={16} className="text-tertiary" /> : <Copy size={16} />}
-                          <span>{copied ? '已复制邀请信息！' : '📋 复制邀请发给 TA'}</span>
+                          <span>{copied ? '已复制邀请链接！' : '📋 复制链接发给 TA'}</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => {
                             sound.playClick();
-                            setCurrentTab('home');
+                            navigate('/home');
                           }}
                           className="flex-1 pixel-btn bg-primary text-on-primary py-3 px-4 font-pixel text-xs flex items-center justify-center gap-1.5 hover:bg-primary/90 font-bold"
                         >
@@ -407,7 +412,7 @@ export const GatePage: React.FC = () => {
             type="button"
             onClick={() => {
               sound.playClick();
-              setCurrentTab('home');
+              navigate('/home');
             }}
             className="font-body text-xs md:text-sm text-on-surface-variant dark:text-surface-dim hover:text-primary underline decoration-2 underline-offset-4"
           >
